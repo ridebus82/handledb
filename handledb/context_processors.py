@@ -12,4 +12,4 @@ def message_processor(request):
     base_time = timezone.now().strftime ("%m%d%M%S")
     base_theme = base_item.theme_status
 
-    return {'base_logo' : base_logo, 'base_company_name': base_company_name,'base_time': base_time, 'base_theme': base_theme}
+    # return {'base_logo' : base_logo, 'base_company_name': base_company_name,'base_time': base_time, 'base_theme': base_theme}
