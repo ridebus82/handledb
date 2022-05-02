@@ -66,6 +66,7 @@
                                 </div>
                                 {% else %}
                                 <div>마케팅 리스트를 추가해주세요!</div>
+                                <input type="hidden" name="dbn_mkname">
                                 {% endif %}
                             </td>
                             <th>DB명</th>
@@ -111,6 +112,13 @@
     <script>
 
 $('#db_addform').submit(function(){
+
+
+    var dbn_mkname = document.querySelector('input[name=dbn_mkname]').value
+    if(!dbn_mkname){
+        alert('마케터 리스트를 먼저 추가해주세요!')
+        return false
+    }
     var dbn_price = document.querySelector('#dbn_price').value
 
     var temp_dbnprice = removeCommas(Num(dbn_price))

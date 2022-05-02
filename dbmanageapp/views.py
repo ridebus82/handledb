@@ -71,13 +71,21 @@ def base_setting(request):
         ds_status = request.POST.get('ds_status')
         ds_statusbase = request.POST.get('ds_statusbase')
         theme_status = request.POST.get('theme_status')
+
+        print(ds_statusbase)
+        print(theme_status)
+
+
         set_model = DbSetting.objects.last()
 
         if set_model:
             set_model.company_name = company_name
             set_model.ds_status = ds_status
-            set_model.ds_statusbase = ds_statusbase
             set_model.theme_status = theme_status
+
+            if ds_statusbase:
+                set_model.ds_statusbase = ds_statusbase
+
             if upload_img:
                 if set_model.logo_image:
                     os.remove(set_model.logo_image.path)
@@ -88,18 +96,22 @@ def base_setting(request):
             dbset = DbSetting()
             dbset.company_name = company_name
             dbset.ds_status = ds_status
-            set_model.ds_statusbase = ds_statusbase
+            if ds_statusbase:
+                set_model.ds_statusbase = ds_statusbase
             set_model.theme_status = theme_status
             if upload_img:
                 dbset.logo_image = upload_img
             dbset.save()
 
-    set_content = DbSetting.objects.last()
-    select_menu = set_content.ds_status
-    if select_menu:
-        select_menu = select_menu.split(',')
-    ontm = set_content.theme_status
 
+    try:
+        set_content = DbSetting.objects.last()
+        select_menu = set_content.ds_status
+        select_menu = select_menu.split(',')
+        ontm = set_content.theme_status
+    except:
+        select_menu = ""
+        ontm = ""
     return render(request, 'dbmanageapp/base_setting.html',
                   {'set_content': set_content, 'select_menu': select_menu, 'ot': ontm})
 
@@ -211,8 +223,14 @@ def alldblist(request):
     q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
     # 전체 페이지값을 구해 페이지네이션을 구현한 뒤 원하는 갯수만큼 출력
     db_list = UploadDb.objects.select_related('db_mkname').filter(q)
+    get_range = list(reversed(range(1, db_list.count())))
+    set_range = make_get_page(get_range, geton['get_page_num'], geton['wp'])
     pagenum = make_get_page(db_list, geton['get_page_num'], geton['wp'])
     db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-id')[pagenum[0]:pagenum[1]]
+
+    print(set_range[0])
+    print(set_range[1])
+    print(get_range[set_range[0]:set_range[1]])
 
     if request.method == 'POST':
         list_num = request.POST.getlist('listcount[]')
@@ -247,9 +265,17 @@ def emp_dblist(request):
     geton = get_getlist(request, q, j)
     status_count = []
 
-    chk_db = DbSetting.objects.last()
-    all_status = chk_db.ds_status
-    status_list = all_status.split(',')
+    try:
+        chk_db = DbSetting.objects.last()
+        all_status = chk_db.ds_status
+        status_list = all_status.split(',')
+        if not all_status:
+            raise Http404()
+    except:
+        error = "상태값이 셋팅되지 않았습니다. 관리자에게 요청해주세요"
+        return render(request, 'dbmanageapp/alldblist.html', {'error': error})
+
+
     status_count = []
     for slist in status_list:
         status_get = UploadDb.objects.select_related('db_mkname').filter(q).filter(db_status=slist)
@@ -360,10 +386,11 @@ def divdb(request):
         return render(request, 'dbmanageapp/alldblist.html', {'error': error})
 
     # 미분배 DB 목록 수량 구하기
+    q = Q()
     db_count_arr = []
     dbn_list = UploadDbName.objects.all()
     for dnlist in dbn_list:
-        q = Q()
+
         arr = []
         q.add(Q(db_manager__isnull=True), q.AND)
         q.add(Q(db_name=dnlist), q.AND)
@@ -534,9 +561,11 @@ def newdbup(request):
     except:
         marketing_list = '마케팅 리스트를 추가해주세요!'
 
-    sample_list = AllManage.objects.last()
-    print(sample_list)
-    print(sample_list.sample_excel_file.path)
+    try:
+        sample_list = AllManage.objects.last()
+    except:
+        sample_list = ""
+
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
 

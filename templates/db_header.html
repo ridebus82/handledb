@@ -48,7 +48,7 @@
             <div class="sb-sidenav-menu">
                 <div class="nav">
                     {% if request.user.rete == "A" %}
-                    <div class="sb-sidenav-menu-heading">관리자 메뉴</div>
+                    <div class="sb-sidenav-menu-heading">관리자 메뉴{{ base_theme }}</div>
                     <a class="nav-link" href="{% url 'dbmanage:base_setting' %}">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-gear"></i></div>
                         기본 설정
