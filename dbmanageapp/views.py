@@ -247,9 +247,17 @@ def emp_dblist(request):
     geton = get_getlist(request, q, j)
     status_count = []
 
-    chk_db = DbSetting.objects.last()
-    all_status = chk_db.ds_status
-    status_list = all_status.split(',')
+    try:
+        chk_db = DbSetting.objects.last()
+        all_status = chk_db.ds_status
+        status_list = all_status.split(',')
+        if not all_status:
+            raise Http404()
+    except:
+        error = "상태값을 먼저 셋팅 해주세요"
+        return render(request, 'dbmanageapp/alldblist.html', {'error': error})
+
+
     status_count = []
     for slist in status_list:
         status_get = UploadDb.objects.select_related('db_mkname').filter(q).filter(db_status=slist)
