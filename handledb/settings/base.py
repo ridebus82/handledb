@@ -119,8 +119,8 @@ AUTH_USER_MODEL = 'accountapp.User'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-# LOGIN_REDIRECT_URL = reverse_lazy('home')
-# LOGOUT_REDIRECT_URL = reverse_lazy('home')
+LOGIN_REDIRECT_URL = reverse_lazy('home')
+LOGOUT_REDIRECT_URL = reverse_lazy('home')
 
 
 #Django Session Timeout Code
