@@ -24,12 +24,9 @@ def super_manage(request):
                 os.remove(temp_super.sample_img.path)
         if end_time:
             temp_super.end_time = end_time
+        temp_super.now_buistatus = nowstatus
+        temp_super.save()
 
-        try:
-            temp_super.now_buistatus = nowstatus
-            temp_super.save()
-        except:
-            print('에러에러')
     set_supaermanage = AllManage.objects.last()
     print(set_supaermanage)
     return render(request, 'allmanageapp/allmanage.html')

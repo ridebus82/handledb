@@ -7,4 +7,3 @@ class AllManage(models.Model):
     sample_image = models.ImageField(upload_to='sample/', null=True, blank=True)
     end_time = models.DateTimeField(auto_now_add=True, null=True)
     now_buistatus = models.CharField(max_length=20, null=True, default='')
-    theme_status = models.CharField(max_length=20, null=True, default='')
