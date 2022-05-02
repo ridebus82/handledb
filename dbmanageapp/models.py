@@ -1,11 +1,17 @@
 from django.core.validators import RegexValidator
 from django.db import models
 
-# Create your models here.
-
 ADV_CHOICE = (('cpa', 'CPA'), ('cpc', 'CPC'), ('cps', 'CPS'), ('cpv', 'CPV'), ('cpm', 'CPM'))
 APPROV_CHOICE = (('Y', '거래'), ('N', '미거래'))
 THEME_CHOICE = (('light', '라이트'), ('dark', '다크'))
+# Create your models here.
+
+class DbSetting(models.Model):
+    ds_status = models.CharField(max_length=255, null=True, blank=True)
+    ds_statusbase = models.CharField(max_length=20, null=True, blank=True, default='')
+    logo_image = models.ImageField(upload_to='setimage/', null=True, blank=True)
+    company_name = models.CharField(max_length=255, null=True)
+    theme_status = models.CharField(choices=THEME_CHOICE, max_length=5, null=False, default='dark')
 
 class MarketingList(models.Model):
     mk_company = models.CharField(max_length=30, null=False)
@@ -20,15 +26,6 @@ class MarketingList(models.Model):
 
     # def __str__(self):
     #     return self.mk_company
-
-
-class DbSetting(models.Model):
-    ds_status = models.CharField(max_length=255, null=True, blank=True)
-    ds_statusbase = models.CharField(max_length=20, null=True, blank=True, default='')
-    logo_image = models.ImageField(upload_to='setimage/', null=True, blank=True)
-    company_name = models.CharField(max_length=255, null=True)
-    theme_status = models.CharField(choices=THEME_CHOICE, max_length=5, null=False, default='dark')
-
 
 class UploadDbName(models.Model):
     dbn_mkname = models.ForeignKey(MarketingList, on_delete=models.SET_NULL, null=True, related_name='mkdname')
