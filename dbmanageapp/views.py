@@ -94,12 +94,13 @@ def base_setting(request):
                 dbset.logo_image = upload_img
             dbset.save()
 
-    set_content = DbSetting.objects.last()
-    select_menu = set_content.ds_status
-    if select_menu:
+    try:
+        set_content = DbSetting.objects.last()
+        select_menu = set_content.ds_status
         select_menu = select_menu.split(',')
-    ontm = set_content.theme_status
-
+        ontm = set_content.theme_status
+    except:
+        ontm = ""
     return render(request, 'dbmanageapp/base_setting.html',
                   {'set_content': set_content, 'select_menu': select_menu, 'ot': ontm})
 
@@ -542,9 +543,13 @@ def newdbup(request):
     except:
         marketing_list = '마케팅 리스트를 추가해주세요!'
 
-    sample_list = AllManage.objects.last()
-    print(sample_list)
-    print(sample_list.sample_excel_file.path)
+    try:
+        sample_list = AllManage.objects.last()
+        print(sample_list)
+        print(sample_list.sample_excel_file.path)
+    except:
+        sample_list = ""
+
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
 
