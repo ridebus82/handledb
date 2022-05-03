@@ -250,7 +250,7 @@ def emp_dblist(request):
     get_list = {}
     geton = get_getlist(request, q, j)
     status_count = []
-
+    q.add(Q(db_manager=request.user), q.AND)
     try:
         chk_db = DbSetting.objects.last()
         all_status = chk_db.ds_status
@@ -265,10 +265,11 @@ def emp_dblist(request):
     status_count = []
     for slist in status_list:
         status_get = UploadDb.objects.select_related('db_mkname').filter(q).filter(db_status=slist)
+        print(status_get)
         status_count.append(status_get.count())
 
     q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
-    q.add(Q(db_manager=request.user), q.AND)
+
     # 전체 페이지값을 구해 페이지네이션을 구현한 뒤 원하는 갯수만큼 출력
     db_list = UploadDb.objects.select_related('db_mkname').filter(q)
     pagenum = make_get_page(db_list, geton['get_page_num'], geton['wp'])
