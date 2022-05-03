@@ -687,7 +687,29 @@ def workAjax(request):
         jsonObject = {'db_names': dbname_arr}
     elif 'del_val' in jsonObject:
         detail_id = jsonObject.get('detail_id')
-        PaidList.objects.get(id=detail_id).delete()
+
+        temp_paid = PaidList.objects.get(id=detail_id)
+
+        may_del_paidprice = int(temp_paid.pl_paidprice)
+        may_change_db_id = temp_paid.pl_chkdb.id
+        changes_db = UploadDb.objects.get(id=may_change_db_id)
+        temp_price = int(changes_db.db_paidprice)
+        temp_price = temp_price - may_del_paidprice
+        changes_db.db_paidprice = temp_price
+
+        if temp_price < 1:
+            changes_db.db_paidstatus = 'N'
+            changes_db.db_status = ""
+
+        changes_db.save()
+
+
+
+
+
+        temp_paid.delete()
+
+
 
     elif 'change_price' in jsonObject:
         detail_id = jsonObject.get('detail_id')

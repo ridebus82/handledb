@@ -117,7 +117,11 @@
                     <tr>
                         <th>총 결제금액</th>
                         <td>
+                            {% if sum.pl_paidprice__sum %}
                             {{ sum.pl_paidprice__sum|intcomma }}원
+                            {% else %}
+                            없음
+                            {% endif %}
                         </td>
                         <th>결제상태</th>
                         <td>
