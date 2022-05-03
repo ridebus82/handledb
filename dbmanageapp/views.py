@@ -215,8 +215,16 @@ def alldblist(request):
     q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
     # 전체 페이지값을 구해 페이지네이션을 구현한 뒤 원하는 갯수만큼 출력
     db_list = UploadDb.objects.select_related('db_mkname').filter(q)
+
+    rangenum = list(reversed(range(1,db_list.count()+1)))
+
+
     pagenum = make_get_page(db_list, geton['get_page_num'], geton['wp'])
     db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-id')[pagenum[0]:pagenum[1]]
+    pg_rangenum = rangenum[pagenum[0]:pagenum[1]]
+
+    alldb_zip = zip(pg_rangenum,db_list_val)
+
 
     if request.method == 'POST':
         list_num = request.POST.getlist('listcount[]')
@@ -236,10 +244,10 @@ def alldblist(request):
     print(get_list)
 
     return render(request, 'dbmanageapp/alldblist.html',
-                  {'db_list_val': db_list_val, 'manager_list': manager_list, 'all_status': all_status,
+                  {'db_list_val': alldb_zip, 'manager_list': manager_list, 'all_status': all_status,
                    'status_list': status_list, 'status_count': status_count,
                    'marketing_list': marketing_list, 'pageval': pagenum[4],
-                   'get_page_num': geton['get_page_num'], 'get_list': geton}, )
+                   'get_page_num': geton['get_page_num'], 'get_list': geton, }, )
 
 
 @login_required

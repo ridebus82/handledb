@@ -208,13 +208,14 @@
                             </tr>
 
 
-                            {% for list in db_list_val %}
+                            {% for num, list in db_list_val %}
+
                             {% if list.db_paidstatus == 'Y' %}
                             <tr style="background-color:#FAF4C0;">
                             {% else %}
                             <tr>
                             {% endif %}
-                                <td>{{ list.id }}</td>
+                                <td>{{ num }}</td>
                                 <td>
                                     <input type="hidden" name="listid[]" value="{{ list.id }}">
                                     <input type="checkbox" name="listcount[]" value="{{ forloop.counter0 }}" class="listchk">
