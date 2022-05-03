@@ -293,11 +293,14 @@ function parent_reload(){
 
                             
                         </div>
+
+                        {% if not request.user.rete == 'D' %}
                         <div>
                             <input type="hidden" name="" value="{{ plist.id }}">
                             <button class="button is-link is-small pay_update">수정</button>
                             <button class="button is-danger is-small pay_delete">삭제</button>
                         </div>
+                        {% endif %}
                     </div>
 
                 </td>

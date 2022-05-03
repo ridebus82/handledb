@@ -148,6 +148,7 @@ def marketer_stats(request):
         # 누적 결제금
         all_count = all_dblist.count()
         paid_count = paid_dblist.count()
+        mk_on_list[ii]['all_count'] = all_count
         mk_on_list[ii]['acc_count'] = len(paid_dblist)
         if paid_count > 0:
             mk_on_list[ii]['acc_per'] = "%.2f%%" % (paid_count / all_count * 100.0)
@@ -170,6 +171,7 @@ def marketer_stats(request):
 
     pagenum = make_get_page(mk_on_list, geton['get_page_num'], 10)
     mk_on_list = mk_on_list[pagenum[0]:pagenum[1]]
+
 
     return render(request, 'dbmanageapp/marketer_stats.html',
                   {'mk_on_list': mk_on_list, 'get_list': geton, 'pageval': pagenum[4],
@@ -240,6 +242,7 @@ def alldblist(request):
                 temp_item.db_manager = change_manager
                 temp_item.db_manager_nick = change_manager_nick
             temp_item.save()
+        return HttpResponseRedirect(reverse_lazy('dbmanage:alldblist'))
 
     print(get_list)
 

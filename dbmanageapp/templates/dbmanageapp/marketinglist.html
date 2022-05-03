@@ -105,13 +105,13 @@
 
             <div class="mt-4 text-center makelist">
                 <button class="button is-link is-small" name="gosubmit" value="create">생성</button>
-                <span class="button is-danger is-small">닫기</span>
+                <span class="button is-danger is-small do_close">닫기</span>
             </div>
 
             <div class="mt-4 text-center updatelist">
                 <button class="button is-link is-small" name="gosubmit" value="update">수정</button>
                 <button class="button is-danger is-small" name="gosubmit" value="delete">삭제</button>
-                <span class="button is-info is-small">닫기</span>
+                <span class="button is-info is-small do_close">닫기</span>
             </div>
     </div>
     </form>
@@ -291,6 +291,12 @@
   $('.modal-background').click(function(){
     $('.addmaketing').removeClass('is-active')
   })
+
+  $('.do_close').click(function(){
+    $('.addmaketing').removeClass('is-active')
+  })
+
+
 
 function get_text(base,num,onname){
 var onparent = base.parentNode.parentNode.children

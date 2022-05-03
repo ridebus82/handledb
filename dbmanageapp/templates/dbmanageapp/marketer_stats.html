@@ -94,6 +94,7 @@
                     <table class="type07">
                         <tr>
                             <th>업체명</th>
+                            <th>총 DB 수량</th>
                             <th>누적 결제건</th>
                             <th>누적 결제율</th>
                             <th>누적 결제금</th>
@@ -104,6 +105,7 @@
                         {% for mlist in mk_on_list %}
                         <tr>
                             <td>{{ mlist.mk_company }}</td>
+                            <td>{{ mlist.all_count }}</td>
                             <td>{{ mlist.acc_count }}</td>
                             <td>{{ mlist.acc_per }}</td>
                             <td>{{ mlist.acc_price|intcomma }} 원</td>
