@@ -167,7 +167,7 @@
                                 <input type="hidden" name="manager_rate[]" value="A">
                                 {% else %}
                                 <div class="select is-small">
-                                    <select name="manager_rate[]">
+                                    <select name="manager_rate[]" class="status_change">
                                         <option value="">선택하세요</option>
                                         <option value="D" {% if ulist.rete == 'D' %}selected{% endif %}>직원</option>
                                         <option value="C" {% if ulist.rete == 'C' %}selected{% endif %}>부관리자</option>
@@ -182,7 +182,7 @@
                                 <input type="hidden" name="manager_status[]" value="Y">
                                 {% else %}
                                 <div class="select is-small">
-                                    <select name="manager_status[]">
+                                    <select name="manager_status[]" class="status_change">
                                         <option value="">선택하세요</option>
                                         <option value="Y" {% if ulist.status == 'Y' %}selected{% endif %}>활동</option>
                                         <option value="N" {% if ulist.status == 'N' %}selected{% endif %}>비활동</option>
@@ -332,6 +332,11 @@
             }
         })
     })
+
+    $('.status_change').change(function(){
+        this.parentNode.parentNode.parentNode.children[0].children[1].checked = true
+    })
+
 
 
 
