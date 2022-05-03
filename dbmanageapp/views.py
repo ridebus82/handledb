@@ -73,11 +73,12 @@ def base_setting(request):
         theme_status = request.POST.get('theme_status')
         set_model = DbSetting.objects.last()
 
+        print()
+
         if set_model:
             set_model.company_name = company_name
             set_model.ds_status = ds_status
-            if ds_statusbase:
-                set_model.ds_statusbase = ds_statusbase
+            set_model.ds_statusbase = ds_statusbase
             set_model.theme_status = theme_status
             if upload_img:
                 if set_model.logo_image:
@@ -89,9 +90,8 @@ def base_setting(request):
             dbset = DbSetting()
             dbset.company_name = company_name
             dbset.ds_status = ds_status
-            if ds_statusbase:
-                set_model.ds_statusbase = ds_statusbase
-            set_model.theme_status = theme_status
+            dbset.ds_statusbase = ds_statusbase
+            dbset.theme_status = theme_status
             if upload_img:
                 dbset.logo_image = upload_img
             dbset.save()
