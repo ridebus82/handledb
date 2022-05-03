@@ -101,6 +101,7 @@ def base_setting(request):
         ontm = set_content.theme_status
     except:
         ontm = ""
+        select_menu = ""
     return render(request, 'dbmanageapp/base_setting.html',
                   {'set_content': set_content, 'select_menu': select_menu, 'ot': ontm})
 
@@ -367,12 +368,12 @@ def divdb(request):
     except:
         error = '마케팅 리스트를 추가해주세요!'
         return render(request, 'dbmanageapp/alldblist.html', {'error': error})
-
+    q = Q()
     # 미분배 DB 목록 수량 구하기
     db_count_arr = []
     dbn_list = UploadDbName.objects.all()
     for dnlist in dbn_list:
-        q = Q()
+
         arr = []
         q.add(Q(db_manager__isnull=True), q.AND)
         q.add(Q(db_name=dnlist), q.AND)
