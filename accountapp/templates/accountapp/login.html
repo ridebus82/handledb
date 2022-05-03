@@ -13,15 +13,6 @@
     <div id="layoutAuthentication_content">
         <main>
             <div class="container">
-                {% if user.is_authenticated %}
-                <script !src="">
-                function goPage() {
-                    location.href="{% url 'accountapp:testpage' %}";
-                 }
-                 goPage()
-
-                </script>
-                {% endif %}
                 <div class="row justify-content-center">
                     <div class="col-12 col-md-9 col-lg-6 mx-auto">
                         <div class="card shadow-lg border-0 rounded-lg mt-5">
