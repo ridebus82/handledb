@@ -86,7 +86,10 @@ __pycache__/
 
 docker-compose.yml
 
+docker-compose_secret.yml
 
 Dockerfile
+
+Dockerfile_secret
 
 nginx.conf

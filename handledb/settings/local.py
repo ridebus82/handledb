@@ -8,7 +8,7 @@ env = environ.Env(
 )
 
 # Take environment variables from .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 
 # False if not in os.environ because of casting above
 DEBUG = True
