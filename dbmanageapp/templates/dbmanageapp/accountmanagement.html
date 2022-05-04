@@ -160,7 +160,9 @@
                                 <input type="checkbox" name="idcount[]" value="{{ forloop.counter0 }}" class="inchk">
                             </td>
                             <td>{{ ulist.username }}</td>
-                            <td>{{ ulist.nickname }}</td>
+                            <td>
+                              <input type="text" name="manager_nick[]" value="{{ ulist.nickname }}" class="input is-info is-small onnick">
+                            </td>
                             <td>
                                 {% if ulist.rete == 'A' %}
                                 마스터
@@ -235,6 +237,8 @@
     </main>
 
     <script !src="">
+
+
 
     $('.change_password').click(function(){
       $('#passchange_modal').addClass('is-active')
@@ -334,7 +338,11 @@
     })
 
     $('.status_change').change(function(){
-        this.parentNode.parentNode.parentNode.children[0].children[1].checked = true
+
+    })
+
+    $('.onnick').focus(function(){
+      this.parentNode.parentNode.children[0].children[1].checked = true
     })
 
 

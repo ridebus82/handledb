@@ -48,10 +48,13 @@
                     </div>
                 </div>
 
-                <div>{{ error }}</div>
+
 
 
                 <div class="addinput_table mt-5">
+                    {% if error_message %}
+                    <div><span class="tag is-danger mb-2 excelerror">{{ error_message }}</span></div>
+                    {% endif %}
                     <table class="type07">
                         <tr>
                             <th>마케터</th>
@@ -109,6 +112,11 @@
     </main>
 
     <script>
+
+    var excelerror = document.querySelector('.excelerror')
+    if(excelerror){
+        alert('업로드 실패! 오류메세지를 확인해주세요')
+   }
 
 $('#db_addform').submit(function(){
     var dbn_price = document.querySelector('#dbn_price').value

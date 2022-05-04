@@ -95,7 +95,12 @@
                         {% for dlist in base_db %}
 
                         <tr>
-                            <td>{{ dlist.db_member }}</td>
+                            <td>
+                                <a class="detail_customer" href="{% url 'dbmanage:detail_customer' id=dlist.id %}"
+                                   onclick="window.open(this.href,'회원정보','width=800, height=800'); return false;">
+                                    <span>{{ dlist.db_member }}</span>
+                                </a>
+                            </td>
                             <td> <span class="phnum">{{ dlist.db_phone }}</span></td>
                             <td>{{ dlist.db_paidstatus }}</td>
                             <td>{{ dlist.db_paidprice|intcomma }}원</td>

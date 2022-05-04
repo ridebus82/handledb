@@ -482,7 +482,21 @@ def markerlist(request):
 
 @login_required
 def newdbup(request):
+    try:
+        marketing_list = MarketingList.objects.all()
+    except:
+        marketing_list = '마케팅 리스트를 추가해주세요!'
+
+    try:
+        sample_list = AllManage.objects.last()
+        print(sample_list)
+        print(sample_list.sample_excel_file.path)
+    except:
+        sample_list = ""
+
+
     if request.method == 'POST':
+        print('asdjflajsf')
 
         dblist_text = request.POST['dblist_text']
         if dblist_text and request.FILES.get('dblist_file') is None:
@@ -501,7 +515,15 @@ def newdbup(request):
         else:
             if request.FILES.get('dblist_file') is not None:
                 files = request.FILES.get('dblist_file')
-                load_wb = load_workbook(files, data_only=True)
+                monkey_patch_openpyxl()
+                print(files)
+
+                try:
+                    load_wb = load_workbook(files, data_only=True)
+                except:
+                    error_message = "엑셀파일에 문제가 있습니다. 새로운 엑셀파일에 데이터를 넣고 업로드 해주세요"
+                    return render(request, 'dbmanageapp/newdbup.html',
+                                  {'marketing_list': marketing_list, 'sample_list': sample_list,'error_message': error_message})
                 load_ws = load_wb['Sheet1']
                 dblist = []
                 for row in load_ws.rows:
@@ -521,7 +543,14 @@ def newdbup(request):
 
                     dblist.append(row_value)
 
-        if dblist:
+
+        try:
+            base_seton = DbSetting.objects.last()
+            base_set_list = base_seton.ds_status.split(',')
+            base_status = base_set_list[0]
+            print(base_status)
+
+            # 업로드 DB 구분을 위한 이름을 만듦
             dbn_mkname = request.POST.get('dbn_mkname')
             dbn_name = request.POST.get('dbn_name')
             dbn_price = request.POST.get('dbn_price')
@@ -535,35 +564,35 @@ def newdbup(request):
             temp_udb = UploadDbName.objects.last()
             onfr = UploadDbName.objects.get(id=temp_udb.id)
             temp_mkt = MarketingList.objects.get(mk_company=dbn_mkname)
+
+            # DB에 값 넣기
             for dbval in dblist:
-                # DB에 값 넣기
-                if len(dbval) < 5:
-                    set_arr_count = 5 - len(dbval)
+                if len(dbval) < 6:
+                    set_arr_count = 6 - len(dbval)
                     print(set_arr_count)
                     for i in range(set_arr_count):
                         dbval.append('')
                 print(dbval)
-                excelup = UploadDb(db_name=onfr, db_mkname=temp_mkt, db_member=dbval[1], db_phone=dbval[0],
-                                   db_age=dbval[2], db_sex=dbval[3], db_inv=dbval[4])
-                excelup.save()
+                db_up = UploadDb(db_name=onfr, db_mkname=temp_mkt, db_member=dbval[1], db_phone=dbval[0],
+                                   db_age=dbval[2], db_sex=dbval[3], db_inv=dbval[4], db_status=base_status)
+                db_up.save()
+
+                if dbval[5]:
+                    serch_menodb = UploadDb.objects.last()
+                    memoup = DbMemo(dm_chkdb=serch_menodb,dm_memos=dbval[5])
+                    memoup.save()
+
 
             messages.success(request, 'DB 업로드가 완료 되었습니다.')
-        else:
+        except:
+            error_message = "업로드 요청된 DB가 없습니다. DB를 입력해주세요"
+            return render(request, 'dbmanageapp/newdbup.html',
+                          {'marketing_list': marketing_list, 'sample_list': sample_list, 'error_message': error_message})
 
-            error = "업로드 요청된 DB가 없습니다. DB를 입력해주세요"
-            return HttpResponseRedirect(reverse('dbmanage:newdbup'))
 
-    try:
-        marketing_list = MarketingList.objects.all()
-    except:
-        marketing_list = '마케팅 리스트를 추가해주세요!'
 
-    try:
-        sample_list = AllManage.objects.last()
-        print(sample_list)
-        print(sample_list.sample_excel_file.path)
-    except:
-        sample_list = ""
+
+
 
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
@@ -577,6 +606,7 @@ def accountmanagement(request):
         id_count = request.POST.getlist('idcount[]')
         manager_status = request.POST.getlist('manager_status[]')
         manager_rate = request.POST.getlist('manager_rate[]')
+        manager_nick = request.POST.getlist('manager_nick[]')
 
         i = 0
         for val in id_count:
@@ -584,6 +614,7 @@ def accountmanagement(request):
             print(temp_user)
             temp_user.rete = manager_rate[int(val)]
             temp_user.status = manager_status[int(val)]
+            temp_user.nickname = manager_nick[int(val)]
             temp_user.save()
 
             i += 1
@@ -829,7 +860,7 @@ def get_getlist(request, q, j):
         wp = request.GET['wp']
         wp = int(wp)
     except:
-        wp = 10
+        wp = 20
     get_list['wp'] = wp
 
     # 마케터 받기 에러처리
@@ -920,3 +951,4 @@ def listStrToInt(list_str):
         i += 1
     list_int = [int(i) for i in list_str]
     return list_int
+

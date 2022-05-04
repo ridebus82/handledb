@@ -33,17 +33,19 @@
                                 <span>갯수 :</span>
                             </div>
 
+
+
                             <div class="select is-small">
                                 <select name="wp">
                                     <option value="10"
-                                            {% if get_list.wp == '10' %} selected="selected" {% endif %}>10
+                                            {% if get_list.wp == '10' %} selected {% endif %}>10
                                     </option>
                                     <option value="20"
-                                            {% if get_list.wp == '20' %} selected="selected" {% endif %}>
+                                            {% if get_list.wp == '20' %} selected {% elif get_list.wp == '' %} selected {% endif %}>
                                     20
                                     </option>
                                     <option value="50"
-                                            {% if get_list.wp == '50' %} selected="selected" {% endif %}>
+                                            {% if get_list.wp == '50' %} selected= {% endif %}>
                                     50
                                     </option>
                                 </select>
