@@ -515,9 +515,6 @@ def newdbup(request):
         else:
             if request.FILES.get('dblist_file') is not None:
                 files = request.FILES.get('dblist_file')
-                monkey_patch_openpyxl()
-                print(files)
-
                 try:
                     load_wb = load_workbook(files, data_only=True)
                 except:
