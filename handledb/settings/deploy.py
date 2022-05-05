@@ -1,14 +1,6 @@
-import os, environ
+
+
 from .base import *
-
-
-def read_secret(secret_name):
-    file = open("/run/secrets/" + secret_name)
-    secret = file.read()
-    secret = secret.rstrip().lstrip()
-    file.close()
-
-    return secret
 
 env = environ.Env(
     # set casting, default value
@@ -16,14 +8,20 @@ env = environ.Env(
 )
 
 # Take environment variables from .env file
-environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+# False if not in os.environ because of casting above
+DEBUG = True
+
+# Raises Django's ImproperlyConfigured
+# exception if SECRET_KEY not in os.environ
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
-SECRET_KEY = read_secret("DJANGO_SECRET_KEY")
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -35,7 +33,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'handledb',
         'USER': 'pcyadmin',
-        'PASSWORD': read_secret("MYSQL_PASSWORD"),
+        'PASSWORD': "rkwkrh13!#",
         'HOST': 'mariadb',
         'PORT': '3306',
     }
