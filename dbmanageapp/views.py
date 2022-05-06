@@ -496,15 +496,11 @@ def newdbup(request):
 
     try:
         sample_list = AllManage.objects.last()
-        print(sample_list)
-        print(sample_list.sample_excel_file.path)
     except:
         sample_list = ""
 
 
     if request.method == 'POST':
-        print('asdjflajsf')
-
         now = datetime.now()
         after_one_week = now - timedelta(weeks=3)
         set_date = set_search_day(after_one_week, now)
@@ -512,8 +508,6 @@ def newdbup(request):
 
         dblist_text = request.POST['dblist_text']
         if dblist_text and request.FILES.get('dblist_file') is None:
-
-            print('여기도 못들어와?????')
             dblist_text = dblist_text.splitlines(False)
 
             i = 0
@@ -539,27 +533,32 @@ def newdbup(request):
                 dblist = []
                 for row in load_ws.rows:
                     row_value = []
-                    cellval = ""
+
                     for cell in row:
                         cellval = cell.value
 
                         cellval = str(cellval)
                         cellval = re.sub("\!|\'|\?|\-", "", cellval)
+
                         if cellval.isdigit():
                             cellval = cellval.zfill(11)
                         if cellval == 'None' or not cellval:
-                            cellval = temp_cellval
+                            cellval = ""
                         row_value.append(cellval)
-                        temp_cellval = cellval
 
+                    chk_list = [v for v in row_value if v]
+
+                    if not chk_list:
+                        break
+
+                    if not row_value[1]:
+                        row_value[1] = row_value[0]
                     dblist.append(row_value)
-
 
         try:
             base_seton = DbSetting.objects.last()
             base_set_list = base_seton.ds_status.split(',')
             base_status = base_set_list[0]
-            print(base_status)
 
             # 업로드 DB 구분을 위한 이름을 만듦
             dbn_mkname = request.POST.get('dbn_mkname')
@@ -580,7 +579,6 @@ def newdbup(request):
             for dbval in dblist:
                 if len(dbval) < 6:
                     set_arr_count = 6 - len(dbval)
-                    print(set_arr_count)
                     for i in range(set_arr_count):
                         dbval.append('')
 
@@ -597,14 +595,13 @@ def newdbup(request):
                         serch_menodb = UploadDb.objects.last()
                         memoup = DbMemo(dm_chkdb=serch_menodb,dm_memos=dbval[5])
                         memoup.save()
-
             if len(dblist) == overlap_count:
                 temp_udb.delete()
-
-
-            if overlap_count:
+                overlap = "모든 항목이 중복됩니다. 같은 파일이 업로드 된것 같습니다."
+            elif overlap_count:
                 overlap = f"{overlap_count} 건이 중복되었습니다."
-
+            else:
+                overlap = ""
             messages.success(request, f"DB 업로드가 완료 되었습니다. {overlap}")
         except:
             error_message = "업로드 요청된 DB가 없습니다. DB를 입력해주세요"
