@@ -207,7 +207,6 @@ def alldblist(request):
 
     get_list = {}
     geton = get_getlist(request, q, j)
-    print(geton)
     status_count = []
 
     for slist in status_list:
@@ -229,22 +228,30 @@ def alldblist(request):
 
 
     if request.method == 'POST':
+
+        print(request.POST['submit_btn'])
+
         list_num = request.POST.getlist('listcount[]')
         list_id = request.POST.getlist('listid[]')
         change_status = request.POST.getlist('change_status[]')
         change_manager = request.POST['change_manager']
         change_manager_nick = request.POST['change_manager_nick']
 
-        for val in list_num:
-            temp_item = UploadDb.objects.get(id=list_id[int(val)])
-            temp_item.db_status = change_status[int(val)]
-            if change_manager:
-                temp_item.db_manager = change_manager
-                temp_item.db_manager_nick = change_manager_nick
-            temp_item.save()
-        return HttpResponseRedirect(reverse_lazy('dbmanage:alldblist'))
+        if 'update' in request.POST['submit_btn']:
+            for val in list_num:
+                temp_item = UploadDb.objects.get(id=list_id[int(val)])
+                temp_item.db_status = change_status[int(val)]
+                if change_manager:
+                    temp_item.db_manager = change_manager
+                    temp_item.db_manager_nick = change_manager_nick
+                    temp_item.save()
 
-    print(get_list)
+        elif 'delete' in request.POST['submit_btn']:
+            for val in list_num:
+                temp_item = UploadDb.objects.get(id=list_id[int(val)])
+                temp_item.delete()
+
+        return HttpResponseRedirect(reverse_lazy('dbmanage:alldblist'))
 
     return render(request, 'dbmanageapp/alldblist.html',
                   {'db_list_val': alldb_zip, 'manager_list': manager_list, 'all_status': all_status,
@@ -498,8 +505,15 @@ def newdbup(request):
     if request.method == 'POST':
         print('asdjflajsf')
 
+        now = datetime.now()
+        after_one_week = now - timedelta(weeks=3)
+        set_date = set_search_day(after_one_week, now)
+        overlap_count = 0
+
         dblist_text = request.POST['dblist_text']
         if dblist_text and request.FILES.get('dblist_file') is None:
+
+            print('여기도 못들어와?????')
             dblist_text = dblist_text.splitlines(False)
 
             i = 0
@@ -569,18 +583,29 @@ def newdbup(request):
                     print(set_arr_count)
                     for i in range(set_arr_count):
                         dbval.append('')
-                print(dbval)
-                db_up = UploadDb(db_name=onfr, db_mkname=temp_mkt, db_member=dbval[1], db_phone=dbval[0],
+
+                chk_overlap_db = UploadDb.objects.filter(db_date__range=[set_date[0], set_date[1]], db_phone=dbval[0])
+
+                if chk_overlap_db:
+                    overlap_count += 1
+                else:
+                    db_up = UploadDb(db_name=onfr, db_mkname=temp_mkt, db_member=dbval[1], db_phone=dbval[0],
                                    db_age=dbval[2], db_sex=dbval[3], db_inv=dbval[4], db_status=base_status)
-                db_up.save()
+                    db_up.save()
 
-                if dbval[5]:
-                    serch_menodb = UploadDb.objects.last()
-                    memoup = DbMemo(dm_chkdb=serch_menodb,dm_memos=dbval[5])
-                    memoup.save()
+                    if dbval[5]:
+                        serch_menodb = UploadDb.objects.last()
+                        memoup = DbMemo(dm_chkdb=serch_menodb,dm_memos=dbval[5])
+                        memoup.save()
+
+            if len(dblist) == overlap_count:
+                temp_udb.delete()
 
 
-            messages.success(request, 'DB 업로드가 완료 되었습니다.')
+            if overlap_count:
+                overlap = f"{overlap_count} 건이 중복되었습니다."
+
+            messages.success(request, f"DB 업로드가 완료 되었습니다. {overlap}")
         except:
             error_message = "업로드 요청된 DB가 없습니다. DB를 입력해주세요"
             return render(request, 'dbmanageapp/newdbup.html',

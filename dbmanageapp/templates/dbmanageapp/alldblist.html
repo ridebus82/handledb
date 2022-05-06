@@ -166,7 +166,7 @@
 
             <div class="table_wrap">
 
-                <form action="" method="post">
+                <form action="" method="post" onsubmit="return checkon()">
                     {% csrf_token %}
 
 
@@ -185,7 +185,12 @@
                         </div>
                         <input type="hidden" name="change_manager_nick" class="change_manager_nick">
                         {% endif %}
-                        <div><button class="button is-success is-small">업데이트</button></div>
+                        <div>
+                            <button type="submit" class="button is-success is-small" name="submit_btn" value="update">업데이트</button>
+                        </div>
+                        <div>
+                            <button type="submit" class="button is-danger is-small ml-2 db_delbtn" name="submit_btn" value="delete">삭제</button>
+                        </div>
                     </div>
 
 
@@ -402,6 +407,15 @@
 
 
     <script>
+
+    $('.db_delbtn').click(function(){
+        if(confirm('삭제하시겠습니까? 삭제하신 자료는 복구할수 없습니다.')){
+
+        }else{
+            return false;
+        }
+    })
+
     function getQueryObj(query) {
       var str, obj = {};
         if (!query) {
