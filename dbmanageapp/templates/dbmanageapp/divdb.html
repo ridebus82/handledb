@@ -84,9 +84,7 @@
                 <table class="type07">
                     <tr>
                         <th>DB 수량</th>
-                        <td style="color:red; font-weight:bold;  font-size:15px;">{{ db_list.count }}</td>
-                        <th>남은 수량</th>
-                        <td style="color:blue; font-weight:bold; font-size:15px;">{{ db_list.count }}</td>
+                        <td style="color:red; font-weight:bold;  font-size:15px;" class="all_db_count">{{ db_list.count }}</td>
                     </tr>
 
                 </table>
@@ -117,7 +115,7 @@
                                 <span>{{ ulist.nickname }}</span>
                             </div>
                             <div class="div_input">
-                                <input class="input is-small" type="number" name="divdb[]">
+                                <input class="input is-small div_input_on" type="number" name="divdb[]">
                                 <input type="hidden" name="divid[]" value="{{ ulist.username }}">
                                 <input type="hidden" name="divnick[]" value="{{ ulist.nickname }}">
                             </div>
@@ -133,6 +131,11 @@
             <span class="success tag is-danger">{{ error_text }}</span>
         </div>
         {% endif %}
+
+        {% for message in messages %}
+        <span
+                {% if message.tags %} class="{{ message.tags }} tag is-link" {% endif %}>{{ message }}</span>
+        {% endfor %}
         <!-- DB 분배 끝 -->
 
         <style>
@@ -159,24 +162,12 @@
                 {% endfor %}
 
             </table>
-            <div class="sum_db_count">합계 :</div>
+            <div class="sum_db_count" style="font-size:16px; font-weight:bold; color: blue;">합계 : {{ all_db_count }}</div>
         </div>
         <!--        분배 전 DB 리스트 끝-->
 
         <!-- DB 분배 시간 -->
 
-
-<!--        <div class="mt-5">-->
-<!--            아래는 나중에!!!-->
-<!--            <table class="type07 div_date">-->
-<!--                <tr>-->
-<!--                    <th>분배 날짜</th>-->
-<!--                    <th>분배 수</th>-->
-<!--                    <th>검색 시작일</th>-->
-<!--                    <th>검색 종료일</th>-->
-<!--                </tr>-->
-<!--            </table>-->
-<!--        </div>-->
 </div>
 
 
@@ -208,8 +199,46 @@
 
 <script !src="">
 
+  var all_db_count = document.querySelector('.all_db_count');
+  var temp_all_db_count = Number(all_db_count.innerText);
+  var div_input_on = document.querySelectorAll('.div_input_on');
+
+  for (var i = 0; i < div_input_on.length; i++) {
+    div_input_on[i].addEventListener('input', function(){
+
+      if(this.value < 0){
+          alert("음수는 입력할수 없습니다.")
+          this.value = ""
+          return false;
+      }
+
+      var sum_count = 0
+      for (var i = 0; i < div_input_on.length; i++) {
+        var sum_count = sum_count + Number(div_input_on[i].value);
+      }
+
+      if(Number(temp_all_db_count) < sum_count){
+        alert('DB 수량의 값보다 더 큽니다. 다시 입력해주세요')
+        this.value = ""
+        return false;
+      }
+
+      var result_all_db_count = temp_all_db_count - sum_count
+      var change_all_db_count = document.querySelector('.all_db_count');
+      change_all_db_count.innerText = result_all_db_count
+
+    });
+  }
+
+
+  function updateValue(e) {
+    log.textContent = e.target.value;
+  }
+
 
 $('.mk').change(function(){
+
+    console.log('askldfjlasdf')
   var mk_name = document.querySelector('.mk').value
   var date_sd = document.querySelector('.currentDate_sd').value
   var date_ed = document.querySelector('.currentDate_ed').value

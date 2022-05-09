@@ -146,7 +146,7 @@
                     <button type="submit" name="sbm_button" value="update"
                             class="button is-info is-rounded is-small mr-2" onclick="parent_reload()">수정
                     </button>
-                    <button type="button" name="button" class="button is-danger is-rounded is-small">닫기</button>
+                    <button type="button" name="button" class="button is-danger is-rounded is-small" onclick="window.close();">닫기</button>
                 </div>
             </div>
             <div class="col-12 col-md-4">
@@ -257,7 +257,7 @@ function parent_reload(){
             {% if memo_list %}
             {% for mlist in memo_list %}
             <tr>
-                <td>{{ mlist.dm_date|date:'y-m-d' }}</td>
+                <td>{{ mlist.dm_date|date:'y-m-d H:i' }}</td>
                 <td>{{ mlist.dm_chkdb.db_manager }}</td>
                 <td>{{ mlist.dm_memos }}</td>
             </tr>
@@ -291,7 +291,7 @@ function parent_reload(){
                             <button class="button is-small is-success pay_updatego" style="display:none">업데이트</button>
                             <span class="show_price">{{ plist.pl_paidprice|intcomma   }}원</span>
 
-                            
+
                         </div>
 
                         {% if not request.user.rete == 'D' %}

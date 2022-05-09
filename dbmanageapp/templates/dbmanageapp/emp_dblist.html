@@ -36,19 +36,19 @@
 
 
                             <div class="select is-small">
-                                <select name="wp">
-                                    <option value="10"
-                                            {% if get_list.wp == '10' %} selected {% endif %}>10
-                                    </option>
-                                    <option value="20"
-                                            {% if get_list.wp == '20' %} selected {% elif get_list.wp == '' %} selected {% endif %}>
-                                    20
-                                    </option>
-                                    <option value="50"
-                                            {% if get_list.wp == '50' %} selected= {% endif %}>
-                                    50
-                                    </option>
-                                </select>
+                              <select name="wp">
+                                  <option value="10"
+                                          {% if get_list.wp == '10' %} selected {% endif %}>10
+                                  </option>
+                                  <option value="20"
+                                          {% if get_list.wp == '20' or get_list.wp == 20 %} selected {% endif %}>
+                                  20
+                                  </option>
+                                  <option value="50"
+                                          {% if get_list.wp == '50' %} selected {% endif %}>
+                                  50
+                                  </option>
+                              </select>
                             </div>
                         </div>
 
@@ -79,10 +79,11 @@
 
 
 
-                        <a href="{% url 'dbmanage:alldblist' %}" class="button is-small is-warning">초기화</a>
+                        <a href="{% url 'dbmanage:alldblist' %}" class="button is-small is-warning d-none">초기화</a>
                     </div>
+                  </form>
                 </div>
-            </form>
+
 
             <!-- 검색끝 -->
 
@@ -113,34 +114,15 @@
 
             <!-- DB 리스트 시작 -->
 
-            <div class="table_wrap">
+            <div class="table_wrap mt-3">
 
-                <form action="" method="post">
+                <form action="" method="post" id="emp_submit">
                     {% csrf_token %}
-
-
-                    <div class="inputflex" style="padding:5px 20px; margin-bottom:0px; justify-content:end">
-                        {% if get_list %}
-                        <div class="center_text">
-                            <span>담당자 변경 :</span>
-                        </div>
-                        <div class="select is-small mr-3">
-                            <select name="change_manager" class="change_manager">
-                                <option value="">선택</option>
-                                {% for mlist in manager_list %}
-                                <option value="{{ mlist.username }}">{{ mlist.nickname }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <input type="hidden" name="change_manager_nick" class="change_manager_nick">
-                        {% endif %}
-                        <div><button class="button is-success is-small">업데이트</button></div>
-                    </div>
-
 
                     <div class="table_area">
                         <table class="type07">
                             <tr>
+                                <th>num</th>
                                 <th>
                                     <input type="checkbox" name="" id="allchk">
                                 </th>
@@ -154,12 +136,13 @@
                             </tr>
 
 
-                            {% for list in db_list_val %}
+                            {% for num, list in db_list_val %}
                             {% if list.db_paidstatus == 'Y' %}
                             <tr style="background-color:#FAF4C0;">
                             {% else %}
                             <tr>
                             {% endif %}
+                                <td>{{ num }}</td>
                                 <td>
                                     <input type="hidden" name="listid[]" value="{{ list.id }}">
                                     <input type="checkbox" name="listcount[]" value="{{ forloop.counter0 }}" class="listchk">
@@ -243,10 +226,10 @@
             	return num.replace(/(^02.{0}|^01.{1}|^[0-9]{3})([0-9]*)([0-9]{4})/, "$1-$2-$3");
             }
 
-            $('.change_manager').change(function(){
-                var checked_opt = $('.change_manager option:checked').text()
-                document.querySelector('.change_manager_nick').value = checked_opt
-            })
+            // $('.change_manager').change(function(){
+            //     var checked_opt = $('.change_manager option:checked').text()
+            //     document.querySelector('.change_manager_nick').value = checked_opt
+            // })
 
             $('.fist_comment').click(function(){
                 var onval = this.parentNode.children
@@ -381,8 +364,9 @@ $('.make_status_list').click(function(){
 })
 
 $('.status_change').change(function(){
-  console.log(this.parentNode.parentNode.parentNode);
   this.parentNode.parentNode.parentNode.children[1].children[1].checked = true
+
+  document.getElementById('emp_submit').submit();
 
 })
 

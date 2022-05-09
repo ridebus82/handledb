@@ -60,7 +60,8 @@ def dbmainpage(request):
     else:
         growth_per = "%.2f%%" % (n_sales / l_sales * 100.0)
 
-    return render(request, 'dbmanageapp/mainpage.html', {'n_sales': n_sales, 'l_sales': l_sales, 'growth_per': growth_per})
+    return render(request, 'dbmanageapp/mainpage.html',
+                  {'n_sales': n_sales, 'l_sales': l_sales, 'growth_per': growth_per})
 
 
 @login_required
@@ -172,7 +173,6 @@ def marketer_stats(request):
     pagenum = make_get_page(mk_on_list, geton['get_page_num'], 10)
     mk_on_list = mk_on_list[pagenum[0]:pagenum[1]]
 
-
     return render(request, 'dbmanageapp/marketer_stats.html',
                   {'mk_on_list': mk_on_list, 'get_list': geton, 'pageval': pagenum[4],
                    'get_page_num': geton['get_page_num'], 'marketing_list': marketing_list})
@@ -217,15 +217,18 @@ def alldblist(request):
     # 전체 페이지값을 구해 페이지네이션을 구현한 뒤 원하는 갯수만큼 출력
     db_list = UploadDb.objects.select_related('db_mkname').filter(q)
 
-    rangenum = list(reversed(range(1,db_list.count()+1)))
-
+    rangenum = list(reversed(range(1, db_list.count() + 1)))
 
     pagenum = make_get_page(db_list, geton['get_page_num'], geton['wp'])
     db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-id')[pagenum[0]:pagenum[1]]
     pg_rangenum = rangenum[pagenum[0]:pagenum[1]]
 
-    alldb_zip = zip(pg_rangenum,db_list_val)
+    alldb_zip = zip(pg_rangenum, db_list_val)
 
+    # print(alldb_zip)
+    #
+    # for uj in alldb_zip:
+    #     print(uj)
 
     if request.method == 'POST':
 
@@ -279,26 +282,34 @@ def emp_dblist(request):
         error = "상태값을 먼저 셋팅 해주세요"
         return render(request, 'dbmanageapp/alldblist.html', {'error': error})
 
-
     status_count = []
     for slist in status_list:
         status_get = UploadDb.objects.select_related('db_mkname').filter(q).filter(db_status=slist)
-        print(status_get)
         status_count.append(status_get.count())
 
     q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
 
     # 전체 페이지값을 구해 페이지네이션을 구현한 뒤 원하는 갯수만큼 출력
     db_list = UploadDb.objects.select_related('db_mkname').filter(q)
+
+    rangenum = list(reversed(range(1, db_list.count() + 1)))
+
     pagenum = make_get_page(db_list, geton['get_page_num'], geton['wp'])
     db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-id')[pagenum[0]:pagenum[1]]
+    pg_rangenum = rangenum[pagenum[0]:pagenum[1]]
+
+    alldb_zip = zip(pg_rangenum, db_list_val)
+    # print(alldb_zip)
+    #
+    # for ih in alldb_zip:
+    #     print(ih)
 
     if request.method == 'POST':
         list_num = request.POST.getlist('listcount[]')
         list_id = request.POST.getlist('listid[]')
         change_status = request.POST.getlist('change_status[]')
-        change_manager = request.POST['change_manager']
-        change_manager_nick = request.POST['change_manager_nick']
+        change_manager = request.POST.get('change_manager')
+        change_manager_nick = request.POST.get('change_manager_nick')
 
         for val in list_num:
             temp_item = UploadDb.objects.get(id=list_id[int(val)])
@@ -308,9 +319,10 @@ def emp_dblist(request):
                 temp_item.db_manager_nick = change_manager_nick
             temp_item.save()
 
-    print(get_list)
+        return HttpResponseRedirect(reverse('dbmanage:emp_dblist'))
+
     return render(request, 'dbmanageapp/emp_dblist.html',
-                  {'db_list_val': db_list_val, 'status_count': status_count, 'status_count': status_count,
+                  {'db_list_val': alldb_zip, 'status_count': status_count, 'status_count': status_count,
                    'status_list': status_list,
                    'pageval': pagenum[4], 'get_page_num': geton['get_page_num'], 'get_list': geton}, )
 
@@ -392,29 +404,32 @@ def divdb(request):
     q = Q()
     # 미분배 DB 목록 수량 구하기
     db_count_arr = []
-    dbn_list = UploadDbName.objects.all()
-    for dnlist in dbn_list:
 
+    dbn_list = UploadDbName.objects.all()
+
+    all_db_count = 0
+    for dnlist in dbn_list:
         arr = []
-        q.add(Q(db_manager__isnull=True), q.AND)
-        q.add(Q(db_name=dnlist), q.AND)
-        db_count = UploadDb.objects.filter(q).count()
-        if (db_count > 0):
+        db_count = UploadDb.objects.filter(db_name=dnlist, db_manager__isnull=True).count()
+        if db_count > 0:
             arr.append(dnlist.dbn_mkname.mk_company)
             arr.append(dnlist.dbn_name)
             arr.append(db_count)
             arr.append(dnlist.dbn_date)
             db_count_arr.append(arr)
 
+        all_db_count = all_db_count + db_count
+
     # 검색 조건들 받자
     j = Q()
     j.add(Q(db_manager__isnull=True), j.AND)
+    q.add(Q(db_manager__isnull=True), j.AND)
 
     geton = get_getlist(request, q, j)
     # 날짜 GET 값 받기 에러 처리
+    db_list = UploadDb.objects.filter(q)
 
-    db_list = UploadDb.objects.filter(j)
-    userlist = User.objects.filter(rete='D')
+    userlist = User.objects.filter(rete='D',status='Y')
 
     error_text = ""
 
@@ -443,9 +458,10 @@ def divdb(request):
                     div_dv_update.db_manager_nick = divnick_list[k]
                     div_dv_update.save()
                 k += 1
+
+            messages.success(request, "분배가 완료되었습니다.")
             return HttpResponseRedirect(reverse('dbmanage:divdb'))
         except:
-            print('여기는 안오는거야??')
             divdb_list = request.POST.getlist('divdb[]')
             list_int = listStrToInt(divdb_list)
             if sum(list_int) == 0:
@@ -453,8 +469,10 @@ def divdb(request):
             elif sum(list_int) > db_list.count():
                 error_text = '분배할 값이 DB 수량보다 많습니다.'
 
+
+
     return render(request, 'dbmanageapp/divdb.html',
-                  {'db_list': db_list, 'userlist': userlist, 'db_count_arr': db_count_arr, 'get_list': geton,
+                  {'db_list': db_list, 'userlist': userlist,'all_db_count':all_db_count, 'db_count_arr': db_count_arr, 'get_list': geton,
                    'marketing_list': marketing_list, 'error_text': error_text})
 
 
@@ -499,7 +517,6 @@ def newdbup(request):
     except:
         sample_list = ""
 
-
     if request.method == 'POST':
         now = datetime.now()
         after_one_week = now - timedelta(weeks=3)
@@ -528,7 +545,8 @@ def newdbup(request):
                 except:
                     error_message = "엑셀파일에 문제가 있습니다. 새로운 엑셀파일에 데이터를 넣고 업로드 해주세요"
                     return render(request, 'dbmanageapp/newdbup.html',
-                                  {'marketing_list': marketing_list, 'sample_list': sample_list,'error_message': error_message})
+                                  {'marketing_list': marketing_list, 'sample_list': sample_list,
+                                   'error_message': error_message})
                 load_ws = load_wb['Sheet1']
                 dblist = []
                 for row in load_ws.rows:
@@ -588,12 +606,12 @@ def newdbup(request):
                     overlap_count += 1
                 else:
                     db_up = UploadDb(db_name=onfr, db_mkname=temp_mkt, db_member=dbval[1], db_phone=dbval[0],
-                                   db_age=dbval[2], db_sex=dbval[3], db_inv=dbval[4], db_status=base_status)
+                                     db_age=dbval[2], db_sex=dbval[3], db_inv=dbval[4], db_status=base_status)
                     db_up.save()
 
                     if dbval[5]:
                         serch_menodb = UploadDb.objects.last()
-                        memoup = DbMemo(dm_chkdb=serch_menodb,dm_memos=dbval[5])
+                        memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[5])
                         memoup.save()
             if len(dblist) == overlap_count:
                 temp_udb.delete()
@@ -606,12 +624,8 @@ def newdbup(request):
         except:
             error_message = "업로드 요청된 DB가 없습니다. DB를 입력해주세요"
             return render(request, 'dbmanageapp/newdbup.html',
-                          {'marketing_list': marketing_list, 'sample_list': sample_list, 'error_message': error_message})
-
-
-
-
-
+                          {'marketing_list': marketing_list, 'sample_list': sample_list,
+                           'error_message': error_message})
 
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
@@ -756,10 +770,6 @@ def workAjax(request):
 
         changes_db.save()
 
-
-
-
-
         temp_paid.delete()
 
 
@@ -885,12 +895,11 @@ def get_getlist(request, q, j):
     # 마케터 받기 에러처리
     try:
         mk = request.GET['mk']
-        if mk:
-            get_list['mk'] = mk
-            chk_ml = MarketingList.objects.get(mk_company=mk)
-            q.add(Q(db_mkname=chk_ml), q.AND)
+        get_list['mk'] = mk
+        chk_ml = MarketingList.objects.get(mk_company=mk)
+        q.add(Q(db_mkname=chk_ml), q.AND)
     except:
-        print('이상 없음!!')
+        get_list['mk'] = ''
 
     # 현재 페이지 값 받기 에러처리
     try:
@@ -911,7 +920,6 @@ def get_getlist(request, q, j):
         ed = datetime.strptime(ed, '%Y-%m-%d')
         set_date = set_search_day(sd, ed)
     except:
-        print('날짜 못받니??')
         now_datetime = datetime.today()
         f_datetime = datetime(now_datetime.year, now_datetime.month, 1)
         set_date = set_search_day(f_datetime, now_datetime)
@@ -924,6 +932,7 @@ def get_getlist(request, q, j):
 def make_get_page(alllist, get_page_num, wantpage):
     # param1 : 전체 게시물 갯수 / param2 : 현재 페이지
     # 전체 카운트를 구해 원하는 숫자로 쪼개 페이지를 나눈다.
+
     pagecount = divmod(len(alllist), wantpage)
     temp_count = 0
     pagelist = []
@@ -938,14 +947,14 @@ def make_get_page(alllist, get_page_num, wantpage):
     get_last_page_num = int(pagecount[0])
     get_last_page_num = get_last_page_num + 1
 
-    start_page_num = int(get_page_num) - 3
-    end_page_num = int(get_page_num) + 2
+    start_page_num = int(get_page_num) - 5
+    end_page_num = int(get_page_num) + 5
 
     if start_page_num <= 0:
-        pageval = pagelist[0:5]
+        pageval = pagelist[0:10]
     elif end_page_num >= get_last_page_num:
         fullpageval = get_last_page_num
-        startval = fullpageval - 5
+        startval = fullpageval - 10
         pageval = pagelist[startval:fullpageval]
     else:
         pageval = pagelist[start_page_num:end_page_num]
@@ -970,4 +979,3 @@ def listStrToInt(list_str):
         i += 1
     list_int = [int(i) for i in list_str]
     return list_int
-
