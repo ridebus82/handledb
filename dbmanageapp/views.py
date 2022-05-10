@@ -433,7 +433,10 @@ def divdb(request):
 
     error_text = ""
 
+    seton = "qsldifalidjf"
+
     if request.method == 'POST':
+
         divdb_list = request.POST.getlist('divdb[]')
         divnick_list = request.POST.getlist('divnick[]')
         divid_list = request.POST.getlist('divid[]')
@@ -446,7 +449,7 @@ def divdb(request):
                 raise
             k = 0
             for list in list_int:
-                db_list = UploadDb.objects.filter(db_manager__isnull=True)
+                db_list = UploadDb.objects.filter(q)
                 db_id_list = []
                 for onid in db_list:
                     db_id_list.append(onid.id)
@@ -671,13 +674,17 @@ def detail_customer(request, id):
         print('문제야 문제')
     db_status = UploadDb.objects.get(id=id)
     if request.method == 'POST':
-
         if request.POST['sbm_button'] == 'update':
-            status_sel = request.POST['status_sel']
-            payment_sel = request.POST['paystatus_sel']
+
+
+            status_sel = request.POST.get('status_sel')
+            payment_sel = request.POST.get('paystatus_sel')
+            customer_name = request.POST.get('customer_name')
 
             db_status.db_status = status_sel
             db_status.db_paidstatus = payment_sel
+            db_status.db_member = customer_name
+
             db_status.save()
 
             messages.success(request, '정상적으로 업데이트 되었습니다.')
