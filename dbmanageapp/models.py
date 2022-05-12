@@ -73,3 +73,8 @@ class PaidList(models.Model):
 class TestField(models.Model):
     td_name = models.CharField(max_length=15)
     td_mkname = models.ManyToManyField(MarketingList, related_name='testfield')
+
+
+class ChkDbReset(models.Model):
+    chk_dbreset = models.CharField(max_length=15)
+    chk_dbtime = models.DateTimeField(auto_now_add=True, null=False)

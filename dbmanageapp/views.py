@@ -451,13 +451,46 @@ def divdb(request):
 
     error_text = ""
 
-    seton = "qsldifalidjf"
+    # test_tempi = {'testval': 'testval'}
+    # print(test_tempi['testval'])
+    #
+    # test_temp = DbUpdateChk.objects.get(id=1)
+    # test_temp2 = test_temp.duc_memo
+    # test_temp3 = eval(test_temp2)
+    # print(type(test_temp3))
+    # print(test_temp3['testval'])
+
+
+
+
+
+
+
+
+
+
+
 
     if request.method == 'POST':
+
+        # #일산꺼 따로 보관
+        # ducon_list = {}
+        # try:
+        #     now_datetime = datetime.today()
+        #     set_time_today = set_search_day(now_datetime, now_datetime)
+        #     ducon = DbUpdateChk.objects.filter(duc_date__range=[set_time_today[0], set_time_today[1]])
+        # except:
+        #     ducon = DbUpdateChk()
+        #
+        #
+
 
         divdb_list = request.POST.getlist('divdb[]')
         divnick_list = request.POST.getlist('divnick[]')
         divid_list = request.POST.getlist('divid[]')
+
+
+        print()
 
         list_int = listStrToInt(divdb_list)
         sum_listint = sum(list_int)
@@ -465,9 +498,12 @@ def divdb(request):
         try:
             if sum_listint == 0 or sum_listint > db_list.count():
                 raise
+
             k = 0
             for list in list_int:
+
                 db_list = UploadDb.objects.filter(q)
+                print(db_list)
                 db_id_list = []
                 for onid in db_list:
                     db_id_list.append(onid.id)
@@ -479,6 +515,11 @@ def divdb(request):
                     div_dv_update.db_manager_nick = divnick_list[k]
                     div_dv_update.save()
                 k += 1
+
+
+
+
+
 
             messages.success(request, "분배가 완료되었습니다.")
             return HttpResponseRedirect(reverse('dbmanage:divdb'))

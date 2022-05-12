@@ -22,13 +22,18 @@ a{text-decoration:none;}
   table.type08 tbody th { padding: 10px; font-weight: bold; vertical-align: middle; border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; background: #ececec; text-align: center;}
   table.type08 td { min-width: 50px; padding: 10px; vertical-align: middle; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; text-align:center; }
 
+  table.type18 { width: 100%; border-collapse: collapse; border-left: 1px solid #ccc; font-size: 12px;}
+  table.type18 tbody th { padding: 3px; font-weight: bold; vertical-align: middle; border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; background: #ececec; text-align: center;}
+  table.type18 td { min-width: 50px; padding: 3px; vertical-align: middle; border: 1px solid #ccc;text-align:center; font-weight: bold;}
+
+
   .div_date td{padding: 5px !important;}
   .div_date th{padding: 5px !important;}
 
   .emp_info{width:60%; display: flex; justify-content: space-around; align-items: center;}
   .div_input{width:40%;}
-  .sepa_emp_out{padding: 2px;}
-  .sepa_emp_wrap{display: flex; padding: 4px;border:1px solid #D5D5D5; margin-bottom: 4px;}
+  .sepa_emp_out{padding: 2px; border:1px solid #D5D5D5; padding: 4px;}
+  .sepa_emp_wrap{display: flex;  margin-bottom: 4px;}
 
   /*
   .memo_right{position: relative;}
