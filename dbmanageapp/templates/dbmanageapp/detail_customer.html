@@ -32,7 +32,7 @@
   .none_date{border-left:1px solid #ccc; border-right:1px solid #ccc; border-bottom:1px solid #ccc; padding: 10px; text-align: center; font-size: 13px;}
   .input_memo_wrap{height: 80%;}
   .input_memo{width:100%; height:100%;}
-
+  .del_btn{color:#FF5A5A; font-size:14px; cursor:pointer}
 
 
 
@@ -180,7 +180,6 @@
 
     $('.add_memo').click(function(){
     var now_id = {{ customer_info.id }}
-    console.log(now_id)
     var db_memo = document.querySelector('.input_memo').value
     if(!db_memo){
         alert('메모를 입력해주세요')
@@ -252,6 +251,7 @@ function parent_reload(){
                 <th>등록일</th>
                 <th>담당자</th>
                 <th>영업상담</th>
+                <th>삭제</th>
             </tr>
 
             {% if memo_list %}
@@ -260,6 +260,10 @@ function parent_reload(){
                 <td>{{ mlist.dm_date|date:'y-m-d H:i' }}</td>
                 <td>{{ mlist.dm_chkdb.db_manager }}</td>
                 <td>{{ mlist.dm_memos }}</td>
+                 <td>
+                     <span class="del_btn"><i class="fa-solid fa-circle-xmark"></i></span>
+                     <input type="hidden" name="onid" value="{{ mlist.id }}">
+                 </td>
             </tr>
             {% endfor %}
             {% endif %}
@@ -324,6 +328,31 @@ $('.pay_update').click(function(){
   this.parentNode.previousElementSibling.firstElementChild.type = 'text'
   this.parentNode.previousElementSibling.firstElementChild.nextElementSibling.style.display = 'inline-block'
   this.parentNode.previousElementSibling.firstElementChild.nextElementSibling.nextElementSibling.style.display = 'none'
+})
+
+$('.del_btn').click(function(){
+    console.log(this.nextElementSibling.value)
+    if(confirm('삭제하시겠습니까? 삭제한 메모는 복구할수 없습니다.')){
+        param = {'del_memo_id' : this.nextElementSibling.value}
+        $.ajax({
+            url : '{% url 'dbmanage:workajax' %}',
+            type : 'POST',
+            headers : {
+              'X-CSRFTOKEN' : '{{ csrf_token }}'
+            },
+            data : JSON.stringify(param),
+            success : function(data){
+              alert('삭제가 완료되었습니다.')
+              window.location.reload()
+              opener.location.reload();
+            },
+            error : function(){
+              console.log('에러다!! 에러가 났다!!!')
+            }
+          })
+    }else{
+        console.log('삭제 노노노')
+    }
 })
 
 $('.pay_updatego').click(function(){

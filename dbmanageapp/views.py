@@ -829,6 +829,10 @@ def workAjax(request):
         user.set_password(receive_pwd)
         user.save()
         return JsonResponse(context)
+    elif 'del_memo_id' in jsonObject:
+        receive_del_memo_id = jsonObject.get('del_memo_id')
+        memos = DbMemo.objects.get(id=receive_del_memo_id)
+        memos.delete()
     else:
         print('-------------------')
         # Http404()
