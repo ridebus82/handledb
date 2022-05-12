@@ -125,5 +125,6 @@ LOGOUT_REDIRECT_URL = reverse_lazy('home')
 
 
 #Django Session Timeout Code
-SESSION_COOKIE_AGE = 1200
+# 1200이면 20분
+SESSION_COOKIE_AGE = 3600
 SESSION_SAVE_EVERY_REQUEST = True

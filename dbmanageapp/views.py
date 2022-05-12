@@ -1,4 +1,6 @@
 import os
+import urllib
+from urllib.parse import urlencode, parse_qsl, urlsplit
 from datetime import datetime, timedelta
 from itertools import chain
 
@@ -14,10 +16,10 @@ import re
 from django.contrib import messages
 from django.db.models import Q, Sum
 from django.http import JsonResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy, resolve
 
 from accountapp.models import User
 from allmanageapp.models import AllManage
@@ -205,15 +207,17 @@ def alldblist(request):
     q = Q()
     j = Q()
 
+
     get_list = {}
     geton = get_getlist(request, q, j)
     status_count = []
+    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
 
     for slist in status_list:
         status_get = UploadDb.objects.select_related('db_mkname').filter(q).filter(db_status=slist)
         status_count.append(status_get.count())
 
-    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+
     # 전체 페이지값을 구해 페이지네이션을 구현한 뒤 원하는 갯수만큼 출력
     db_list = UploadDb.objects.select_related('db_mkname').filter(q)
 
@@ -224,11 +228,6 @@ def alldblist(request):
     pg_rangenum = rangenum[pagenum[0]:pagenum[1]]
 
     alldb_zip = zip(pg_rangenum, db_list_val)
-
-    # print(alldb_zip)
-    #
-    # for uj in alldb_zip:
-    #     print(uj)
 
     if request.method == 'POST':
 
@@ -241,20 +240,25 @@ def alldblist(request):
         change_manager_nick = request.POST['change_manager_nick']
 
         if 'update' in request.POST['submit_btn']:
+            print('업데이트에여~~~~')
             for val in list_num:
                 temp_item = UploadDb.objects.get(id=list_id[int(val)])
                 temp_item.db_status = change_status[int(val)]
                 if change_manager:
                     temp_item.db_manager = change_manager
                     temp_item.db_manager_nick = change_manager_nick
-                    temp_item.save()
+                temp_item.save()
 
         elif 'delete' in request.POST['submit_btn']:
             for val in list_num:
                 temp_item = UploadDb.objects.get(id=list_id[int(val)])
                 temp_item.delete()
 
-        return HttpResponseRedirect(reverse_lazy('dbmanage:alldblist'))
+        qstring = request.POST.get('qstring')
+        response = redirect(reverse('dbmanage:alldblist'))
+        response['Location'] += "?"
+        response['Location'] += qstring
+        return response
 
     return render(request, 'dbmanageapp/alldblist.html',
                   {'db_list_val': alldb_zip, 'manager_list': manager_list, 'all_status': all_status,
@@ -282,12 +286,14 @@ def emp_dblist(request):
         error = "상태값을 먼저 셋팅 해주세요"
         return render(request, 'dbmanageapp/alldblist.html', {'error': error})
 
+    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+
     status_count = []
     for slist in status_list:
         status_get = UploadDb.objects.select_related('db_mkname').filter(q).filter(db_status=slist)
         status_count.append(status_get.count())
 
-    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+
 
     # 전체 페이지값을 구해 페이지네이션을 구현한 뒤 원하는 갯수만큼 출력
     db_list = UploadDb.objects.select_related('db_mkname').filter(q)
@@ -299,10 +305,6 @@ def emp_dblist(request):
     pg_rangenum = rangenum[pagenum[0]:pagenum[1]]
 
     alldb_zip = zip(pg_rangenum, db_list_val)
-    # print(alldb_zip)
-    #
-    # for ih in alldb_zip:
-    #     print(ih)
 
     if request.method == 'POST':
         list_num = request.POST.getlist('listcount[]')
@@ -319,12 +321,23 @@ def emp_dblist(request):
                 temp_item.db_manager_nick = change_manager_nick
             temp_item.save()
 
-        return HttpResponseRedirect(reverse('dbmanage:emp_dblist'))
+        qstring = request.POST.get('qstring')
+        response = redirect(reverse('dbmanage:emp_dblist'))
+        response['Location'] += "?"
+        response['Location'] += qstring
+        return response
+
+    testval = {'test1' : 'asdfasdf', 'test2' : 'asdfasdfdfg'}
+    for key, val in testval.items():
+        print(key)
+        print(val)
+
 
     return render(request, 'dbmanageapp/emp_dblist.html',
                   {'db_list_val': alldb_zip, 'status_count': status_count, 'status_count': status_count,
                    'status_list': status_list,
                    'pageval': pagenum[4], 'get_page_num': geton['get_page_num'], 'get_list': geton}, )
+
 
 
 @login_required
@@ -928,8 +941,10 @@ def get_getlist(request, q, j):
         set_date = set_search_day(sd, ed)
     except:
         now_datetime = datetime.today()
-        f_datetime = datetime(now_datetime.year, now_datetime.month, 1)
-        set_date = set_search_day(f_datetime, now_datetime)
+        # 이번달 초로 날짜 구함
+        # f_datetime = datetime(now_datetime.year, now_datetime.month, 1)
+
+        set_date = set_search_day(now_datetime, now_datetime)
     get_list['set_date'] = set_date
 
     get_list['q'] = q

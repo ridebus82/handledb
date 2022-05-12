@@ -19,6 +19,7 @@
             <!-- 검색 -->
             <div class="pt-4">
                 <form action="" method="get">
+
                     <div class="inputlist">
                         <div class="inputflex">
                             <div class="center_text">
@@ -168,6 +169,7 @@
 
                 <form action="" method="post" onsubmit="return checkon()">
                     {% csrf_token %}
+                    <input type="hidden" name="qstring" class="qstring">
 
 
                     <div class="inputflex" style="padding:5px 20px; margin-bottom:0px; justify-content:end">
@@ -294,6 +296,13 @@
 
             <script !src="">
 
+
+                var str = location.href;
+                var q_string = str.split('?')
+                document.querySelector('.qstring').value = q_string[1]
+
+
+
             var phnum = document.querySelectorAll('.phnum')
             for (var i = 0; i < phnum.length; i++) {
                 var tempval = phnum[i].innerText
@@ -387,7 +396,7 @@
     {% if not get_list.sd %}
     <script !src="">
         var t_date = new Date()
-        var t_date = new Date(t_date.getFullYear(), t_date.getMonth(), 1);
+        // var t_date = new Date(t_date.getFullYear(), t_date.getMonth(), 1);
         t_date.setHours(t_date.getHours()+9)
         var dateval = t_date.toISOString().substring(0, 10)
         $('.currentDate_sd').val(dateval)
