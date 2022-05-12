@@ -213,6 +213,8 @@ def alldblist(request):
     status_count = []
     q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
 
+    all_get = UploadDb.objects.select_related('db_mkname').filter(q)
+    all_count = all_get.count()
     for slist in status_list:
         status_get = UploadDb.objects.select_related('db_mkname').filter(q).filter(db_status=slist)
         status_count.append(status_get.count())
@@ -264,7 +266,7 @@ def alldblist(request):
                   {'db_list_val': alldb_zip, 'manager_list': manager_list, 'all_status': all_status,
                    'status_list': status_list, 'status_count': status_count,
                    'marketing_list': marketing_list, 'pageval': pagenum[4],
-                   'get_page_num': geton['get_page_num'], 'get_list': geton, }, )
+                   'get_page_num': geton['get_page_num'], 'get_list': geton, 'all_count': all_count}, )
 
 
 @login_required
@@ -289,6 +291,9 @@ def emp_dblist(request):
     q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
 
     status_count = []
+
+    all_get = UploadDb.objects.select_related('db_mkname').filter(q)
+    all_count = all_get.count()
     for slist in status_list:
         status_get = UploadDb.objects.select_related('db_mkname').filter(q).filter(db_status=slist)
         status_count.append(status_get.count())
@@ -336,7 +341,7 @@ def emp_dblist(request):
     return render(request, 'dbmanageapp/emp_dblist.html',
                   {'db_list_val': alldb_zip, 'status_count': status_count, 'status_count': status_count,
                    'status_list': status_list,
-                   'pageval': pagenum[4], 'get_page_num': geton['get_page_num'], 'get_list': geton}, )
+                   'pageval': pagenum[4], 'get_page_num': geton['get_page_num'], 'get_list': geton, 'all_count': all_count}, )
 
 
 
@@ -677,6 +682,7 @@ def detail_customer(request, id):
     try:
         # 상태값 뿌려주기
         chk_db = DbSetting.objects.values_list()
+
         status_list = chk_db[0][1].split(',')
         # 회원정보 뿌려주기
         customer_info = UploadDb.objects.get(id=id)

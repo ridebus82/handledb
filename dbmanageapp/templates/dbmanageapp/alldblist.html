@@ -149,11 +149,13 @@
             <div class="col-12 col-lg-6 dbtable_area">
                 <table class="type05 w-100">
                     <tr>
+                        <th>총</th>
                         {% for slist in status_list %}
                         <th>{{ slist }}</th>
                         {% endfor %}
                     </tr>
                     <tr>
+                        <td>{{ all_count }}</td>
                         {% for clist in status_count %}
                         <td>{{ clist }}</td>
                         {% endfor %}
