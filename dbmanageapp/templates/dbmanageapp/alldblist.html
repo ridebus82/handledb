@@ -262,9 +262,9 @@
                                 <td>
                                     {% if list.dmchkdb.all %}
                                     {% for clist in list.dmchkdb.all|dictsortreversed:"id" %}
-                                    {% if forloop.counter0 == 0 %}
+                                    {% if forloop.counter0 < 3 %}
                                     <div class="fist_comment">{{ clist.dm_memos|truncatechars:25 }}</div>
-                                    {% elif forloop.counter0 < 3 %}
+                                    {% else %}
                                     <div style="display:none;">{{ clist.dm_memos|truncatechars:25 }}</div>
                                     {% endif %}
                                     {% endfor %}
@@ -325,7 +325,7 @@
 
             $('.fist_comment').click(function(){
                 var onval = this.parentNode.children
-                $(onval).not(':first').toggle();
+                $(onval).not('.fist_comment').toggle();
             })
 
             $('#allchk').change(function(){
