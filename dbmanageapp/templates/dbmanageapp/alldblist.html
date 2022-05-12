@@ -264,7 +264,7 @@
                                     {% for clist in list.dmchkdb.all|dictsortreversed:"id" %}
                                     {% if forloop.counter0 == 0 %}
                                     <div class="fist_comment">{{ clist.dm_memos|truncatechars:25 }}</div>
-                                    {% else %}
+                                    {% elif forloop.counter0 < 3 %}
                                     <div style="display:none;">{{ clist.dm_memos|truncatechars:25 }}</div>
                                     {% endif %}
                                     {% endfor %}
