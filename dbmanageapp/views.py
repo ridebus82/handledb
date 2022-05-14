@@ -250,11 +250,20 @@ def alldblist(request):
                     temp_item.db_manager = change_manager
                     temp_item.db_manager_nick = change_manager_nick
                 temp_item.save()
+        elif 'all_delete' in request.POST['submit_btn']:
+            print('여기아냐?')
+            now_datetime = datetime.today()
+            set_time_today = set_search_day(now_datetime, now_datetime)
+            print(set_time_today)
+            del_alldb = UploadDb.objects.filter(db_date__range=[set_time_today[0], set_time_today[1]])
+            del_alldb.delete()
 
         elif 'delete' in request.POST['submit_btn']:
+            print('1111111111111')
             for val in list_num:
                 temp_item = UploadDb.objects.get(id=list_id[int(val)])
                 temp_item.delete()
+
 
         qstring = request.POST.get('qstring')
         response = redirect(reverse('dbmanage:alldblist'))
@@ -631,9 +640,17 @@ def newdbup(request):
                     if not chk_list:
                         break
 
-                    if not row_value[1]:
+
+                    # if not row_value[1]:
+                    #     row_value[1] = row_value[0]
+                    if len(row_value) < 2:
+                        temp_rowval = row_value[0]
+                        row_value.append(temp_rowval)
+                    elif not row_value[1]:
                         row_value[1] = row_value[0]
+
                     dblist.append(row_value)
+
 
         try:
             base_seton = DbSetting.objects.last()
