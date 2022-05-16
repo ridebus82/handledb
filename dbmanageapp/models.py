@@ -60,7 +60,7 @@ class UploadDb(models.Model):
 
 class DbMemo(models.Model):
     dm_chkdb = models.ForeignKey(UploadDb, on_delete=models.CASCADE, null=False, related_name='dmchkdb', default='')
-    dm_memos = models.CharField(max_length=255, null=False, default='')
+    dm_memos = models.CharField(max_length=2550, null=False, default='')
     dm_date = models.DateTimeField(auto_now_add=True, null=False)
 
 
