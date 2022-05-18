@@ -679,27 +679,32 @@ def newdbup(request):
                     for i in range(set_arr_count):
                         dbval.append('')
 
-                chk_overlap_db = UploadDb.objects.filter(db_date__range=[set_date[0], set_date[1]], db_phone=dbval[0])
+                db_up = UploadDb(db_name=onfr, db_mkname=temp_mkt, db_member=dbval[1], db_phone=dbval[0],
+                                 db_age=dbval[2], db_sex=dbval[3], db_inv=dbval[4], db_status=base_status)
+                db_up.save()
 
-                if chk_overlap_db:
-                    overlap_count += 1
-                else:
-                    db_up = UploadDb(db_name=onfr, db_mkname=temp_mkt, db_member=dbval[1], db_phone=dbval[0],
-                                     db_age=dbval[2], db_sex=dbval[3], db_inv=dbval[4], db_status=base_status)
-                    db_up.save()
+                if dbval[5]:
+                    serch_menodb = UploadDb.objects.last()
+                    memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[5])
+                    memoup.save()
 
-                    if dbval[5]:
-                        serch_menodb = UploadDb.objects.last()
-                        memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[5])
-                        memoup.save()
-            if len(dblist) == overlap_count:
-                temp_udb.delete()
-                overlap = "모든 항목이 중복됩니다. 같은 파일이 업로드 된것 같습니다."
-            elif overlap_count:
-                overlap = f"{overlap_count} 건이 중복되었습니다."
-            else:
-                overlap = ""
-            messages.success(request, f"DB 업로드가 완료 되었습니다. {overlap}")
+
+
+
+
+
+        # chk_overlap_db = UploadDb.objects.filter(db_date__range=[set_date[0], set_date[1]], db_phone=dbval[0])
+        #
+        # if chk_overlap_db:
+        #     overlap_count += 1
+        #     if len(dblist) == overlap_count:
+        #         temp_udb.delete()
+        #         overlap = "모든 항목이 중복됩니다. 같은 파일이 업로드 된것 같습니다."
+        #     elif overlap_count:
+        #         overlap = f"{overlap_count} 건이 중복되었습니다."
+        #     else:
+        #         overlap = ""
+            messages.success(request, f"DB 업로드가 완료 되었습니다.")
         except:
             error_message = "업로드 요청된 DB가 없습니다. DB를 입력해주세요"
             return render(request, 'dbmanageapp/newdbup.html',
