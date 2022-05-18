@@ -689,20 +689,30 @@ def newdbup(request):
                     memoup.save()
 
             # 쌩 업로드 완료! DB 중복 체크 시작!
-            chk_db_name = UploadDbName.objects.last()
-            chk_db_list = UploadDb.objects.filter(db_name=chk_db_name)
+
+
+            lastSeenId = float('-Inf')
+            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('db_phone')
+            for row in chk_db_list:
+                if row.db_phone == lastSeenId:
+                    row.delete()  # We've seen this id in a previous row
+                else:  # New id found, save it and check future rows for duplicates.
+                    lastSeenId = row.db_phone
+
+
 
             # 업로드된 DB를 가지고 전체를 돌면서 중복항목 제거!!!
-            for chk in chk_db_list:
-                overlap_chk = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]],db_phone=chk.db_phone)
-                if overlap_chk.count() > 1:
-                    del_count = 0
-                    for del_chk in overlap_chk:
-                        del_count += 1
-                        if del_count == 1:
-                            continue
-                        else:
-                            del_chk.delete()
+            # for chk in chk_db_list:
+            #     overlap_chk = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]],db_phone=chk.db_phone)
+            #     if overlap_chk.count() > 1:
+            #         del_count = 0
+            #         for del_chk in overlap_chk:
+            #             del_count += 1
+            #             if del_count == 1:
+            #                 continue
+            #             else:
+            #                 del_chk.delete()
+
 
 
 
@@ -733,6 +743,8 @@ def newdbup(request):
                           {'marketing_list': marketing_list, 'sample_list': sample_list,
                            'error_message': error_message})
 
+    lastSeenId = float('-Inf')
+    print(lastSeenId)
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
 
