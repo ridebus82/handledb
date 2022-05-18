@@ -688,6 +688,28 @@ def newdbup(request):
                     memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[5])
                     memoup.save()
 
+            # 쌩 업로드 완료! DB 중복 체크 시작!
+            chk_db_name = UploadDbName.objects.last()
+            chk_db_list = UploadDb.objects.filter(db_name=chk_db_name)
+
+            # 업로드된 DB를 가지고 전체를 돌면서 중복항목 제거!!!
+            for chk in chk_db_list:
+                overlap_chk = UploadDb.objects.filter(db_phone=chk.db_phone)
+                if overlap_chk.count() > 1:
+                    del_count = 0
+                    for del_chk in overlap_chk:
+                        del_count += 1
+                        if del_count == 1:
+                            continue
+                        else:
+                            del_chk.delete()
+
+
+
+
+
+
+
 
 
 
