@@ -76,8 +76,6 @@ def base_setting(request):
         theme_status = request.POST.get('theme_status')
         set_model = DbSetting.objects.last()
 
-        print()
-
         if set_model:
             set_model.company_name = company_name
             set_model.ds_status = ds_status
@@ -233,7 +231,6 @@ def alldblist(request):
 
     if request.method == 'POST':
 
-        print(request.POST['submit_btn'])
 
         list_num = request.POST.getlist('listcount[]')
         list_id = request.POST.getlist('listid[]')
@@ -242,7 +239,7 @@ def alldblist(request):
         change_manager_nick = request.POST['change_manager_nick']
 
         if 'update' in request.POST['submit_btn']:
-            print('업데이트에여~~~~')
+
             for val in list_num:
                 temp_item = UploadDb.objects.get(id=list_id[int(val)])
                 temp_item.db_status = change_status[int(val)]
@@ -251,15 +248,12 @@ def alldblist(request):
                     temp_item.db_manager_nick = change_manager_nick
                 temp_item.save()
         elif 'all_delete' in request.POST['submit_btn']:
-            print('여기아냐?')
             now_datetime = datetime.today()
             set_time_today = set_search_day(now_datetime, now_datetime)
-            print(set_time_today)
             del_alldb = UploadDb.objects.filter(db_date__range=[set_time_today[0], set_time_today[1]])
             del_alldb.delete()
 
         elif 'delete' in request.POST['submit_btn']:
-            print('1111111111111')
             for val in list_num:
                 temp_item = UploadDb.objects.get(id=list_id[int(val)])
                 temp_item.delete()
@@ -341,11 +335,6 @@ def emp_dblist(request):
         response['Location'] += qstring
         return response
 
-    testval = {'test1' : 'asdfasdf', 'test2' : 'asdfasdfdfg'}
-    for key, val in testval.items():
-        print(key)
-        print(val)
-
 
     return render(request, 'dbmanageapp/emp_dblist.html',
                   {'db_list_val': alldb_zip, 'status_count': status_count, 'status_count': status_count,
@@ -356,14 +345,12 @@ def emp_dblist(request):
 
 @login_required
 def emp_dbstats(request):
-    print(request.user)
     # -------------- 뿌려주기 옵션값 끝!
     q = Q()
     j = Q()
 
     get_list = {}
     geton = get_getlist(request, q, j)
-    print(geton)
 
     q.add(Q(db_manager=request.user), q.AND)
     j.add(Q(db_manager=request.user), q.AND)
@@ -460,15 +447,6 @@ def divdb(request):
 
     error_text = ""
 
-    # test_tempi = {'testval': 'testval'}
-    # print(test_tempi['testval'])
-    #
-    # test_temp = DbUpdateChk.objects.get(id=1)
-    # test_temp2 = test_temp.duc_memo
-    # test_temp3 = eval(test_temp2)
-    # print(type(test_temp3))
-    # print(test_temp3['testval'])
-
 
 
 
@@ -498,9 +476,6 @@ def divdb(request):
         divnick_list = request.POST.getlist('divnick[]')
         divid_list = request.POST.getlist('divid[]')
 
-
-        print()
-
         list_int = listStrToInt(divdb_list)
         sum_listint = sum(list_int)
 
@@ -512,7 +487,6 @@ def divdb(request):
             for list in list_int:
 
                 db_list = UploadDb.objects.filter(q)
-                print(db_list)
                 db_id_list = []
                 for onid in db_list:
                     db_id_list.append(onid.id)
@@ -551,7 +525,6 @@ def divdb(request):
 def markerlist(request):
     if request.method == 'POST':
         btnval = request.POST['gosubmit']
-        print(btnval)
         if btnval == 'create':
             newmarketer = MarketingList(mk_company=request.POST['mk_company'], mk_name=request.POST['mk_name'],
                                         mk_phone=request.POST['mk_phone'], mk_advtype=request.POST['mk_advtype'],
@@ -651,7 +624,6 @@ def newdbup(request):
 
                     dblist.append(row_value)
 
-
         try:
             base_seton = DbSetting.objects.last()
             base_set_list = base_seton.ds_status.split(',')
@@ -672,6 +644,7 @@ def newdbup(request):
             onfr = UploadDbName.objects.get(id=temp_udb.id)
             temp_mkt = MarketingList.objects.get(mk_company=dbn_mkname)
 
+            dblist_count = len(dblist)
             # DB에 값 넣기
             for dbval in dblist:
                 if len(dbval) < 6:
@@ -689,60 +662,30 @@ def newdbup(request):
                     memoup.save()
 
             # 쌩 업로드 완료! DB 중복 체크 시작!
+            overlap_count = 0
             lastSeenId = float('-Inf')
             chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('db_phone')
             for row in chk_db_list:
                 if row.db_phone == lastSeenId:
+                    overlap_count += 1
                     row.delete()  # We've seen this id in a previous row
                 else:  # New id found, save it and check future rows for duplicates.
                     lastSeenId = row.db_phone
 
-
-
-            # 업로드된 DB를 가지고 전체를 돌면서 중복항목 제거!!!
-            # for chk in chk_db_list:
-            #     overlap_chk = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]],db_phone=chk.db_phone)
-            #     if overlap_chk.count() > 1:
-            #         del_count = 0
-            #         for del_chk in overlap_chk:
-            #             del_count += 1
-            #             if del_count == 1:
-            #                 continue
-            #             else:
-            #                 del_chk.delete()
-
-
-
-
-
-
-
-
-
-
-
-
-
-        # chk_overlap_db = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]], db_phone=dbval[0])
-        #
-        # if chk_overlap_db:
-        #     overlap_count += 1
-        #     if len(dblist) == overlap_count:
-        #         temp_udb.delete()
-        #         overlap = "모든 항목이 중복됩니다. 같은 파일이 업로드 된것 같습니다."
-        #     elif overlap_count:
-        #         overlap = f"{overlap_count} 건이 중복되었습니다."
-        #     else:
-        #         overlap = ""
-            messages.success(request, f"DB 업로드가 완료 되었습니다.")
+            if overlap_count == dblist_count:
+                temp_udb.delete()
+                overlap = "모든 항목이 중복됩니다. 같은 파일이 업로드 된것 같습니다."
+            elif overlap_count:
+                overlap = f"{overlap_count} 건이 중복되었습니다."
+            else:
+                overlap = ""
+            messages.success(request, f"DB 업로드가 완료 되었습니다. {overlap}")
         except:
             error_message = "업로드 요청된 DB가 없습니다. DB를 입력해주세요"
             return render(request, 'dbmanageapp/newdbup.html',
                           {'marketing_list': marketing_list, 'sample_list': sample_list,
                            'error_message': error_message})
 
-    lastSeenId = float('-Inf')
-    print(lastSeenId)
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
 
@@ -760,7 +703,6 @@ def accountmanagement(request):
         i = 0
         for val in id_count:
             temp_user = User.objects.get(id=id_list[int(val)])
-            print(temp_user)
             temp_user.rete = manager_rate[int(val)]
             temp_user.status = manager_status[int(val)]
             temp_user.nickname = manager_nick[int(val)]
@@ -900,7 +842,6 @@ def workAjax(request):
         change_price = jsonObject.get('change_price')
         update_item = PaidList.objects.get(id=detail_id)
         update_item.pl_paidprice = change_price
-        print(update_item.pl_chkdb)
         update_item.save()
 
     elif 'add_username' in jsonObject:
@@ -919,7 +860,6 @@ def workAjax(request):
 
         receive_num = jsonObject.get('choices_num')
         receive_pwd = jsonObject.get('change_pw_input')
-        print(type(receive_num))
         user = User.objects.get(id=int(receive_num))
         user.set_password(receive_pwd)
         user.save()
@@ -929,7 +869,6 @@ def workAjax(request):
         memos = DbMemo.objects.get(id=receive_del_memo_id)
         memos.delete()
     else:
-        print('-------------------')
         # Http404()
         context = {'testpppp': 'testkjkasjdfkajsdkfj'}
         return JsonResponse(context)
