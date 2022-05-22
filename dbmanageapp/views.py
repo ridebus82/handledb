@@ -66,6 +66,7 @@ def dbmainpage(request):
                   {'n_sales': n_sales, 'l_sales': l_sales, 'growth_per': growth_per})
 
 
+
 @login_required
 def base_setting(request):
     if request.method == 'POST':
@@ -209,10 +210,14 @@ def alldblist(request):
     get_list = {}
     geton = get_getlist(request, q, j)
     status_count = []
-    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+
+    #변경 부분1
+    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]])|Q(db_divdate__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+
 
     all_get = UploadDb.objects.select_related('db_mkname').filter(q)
     all_count = all_get.count()
+
     for slist in status_list:
         status_get = UploadDb.objects.select_related('db_mkname').filter(q).filter(db_status=slist)
         status_count.append(status_get.count())
@@ -224,7 +229,8 @@ def alldblist(request):
     rangenum = list(reversed(range(1, db_list.count() + 1)))
 
     pagenum = make_get_page(db_list, geton['get_page_num'], geton['wp'])
-    db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-id')[pagenum[0]:pagenum[1]]
+    #변경부분2
+    db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-db_divdate','-db_date')[pagenum[0]:pagenum[1]]
     pg_rangenum = rangenum[pagenum[0]:pagenum[1]]
 
     alldb_zip = zip(pg_rangenum, db_list_val)
@@ -264,13 +270,56 @@ def alldblist(request):
         response['Location'] += "?"
         response['Location'] += qstring
         return response
-
     return render(request, 'dbmanageapp/alldblist.html',
                   {'db_list_val': alldb_zip, 'manager_list': manager_list, 'all_status': all_status,
                    'status_list': status_list, 'status_count': status_count,
                    'marketing_list': marketing_list, 'pageval': pagenum[4],
                    'get_page_num': geton['get_page_num'], 'get_list': geton, 'all_count': all_count}, )
 
+@login_required
+def status_stats(request):
+    # 상태값 입력 안되었을때 에러처리
+    try:
+        chk_db = DbSetting.objects.last()
+        all_status = chk_db.ds_status
+        status_list = all_status.split(',')
+        if not all_status:
+            raise Http404()
+    except:
+        error = "상태값을 먼저 셋팅 해주세요"
+        return render(request, 'dbmanageapp/alldblist.html', {'error': error})
+
+    # 마케팅 리스트 에러 처리 (초기값 셋팅 X)
+    try:
+        marketing_list = MarketingList.objects.all()
+    except:
+        error = '마케팅 리스트를 추가해주세요!'
+        return render(request, 'dbmanageapp/alldblist.html', {'error': error})
+
+    # 담당자(매니저) 리스트 뿌려주기
+    manager_list = User.objects.filter(rete='D').values('username')
+
+    # 여기서부터 Q값 넣기 시작!!
+    q = Q()
+    j = Q()
+
+    geton = get_getlist(request, q, j)
+
+    all_list_arr = []
+
+    for manager in manager_list:
+        manager_list_arr = []
+        manager_list_arr.append(manager)
+        for slist in status_list:
+            q = Q()
+            q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]) | Q(db_divdate__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+            q.add(Q(db_manager=manager['username']), q.AND)
+            q.add(Q(db_status=slist), q.AND)
+            chk_db = UploadDb.objects.filter(q)
+            manager_list_arr.append(chk_db.count())
+        all_list_arr.append(manager_list_arr)
+
+    return render(request, 'dbmanageapp/status_stats.html', {'all_list_arr': all_list_arr, 'status_list': status_list})
 
 @login_required
 def emp_dblist(request):
@@ -291,7 +340,10 @@ def emp_dblist(request):
         error = "상태값을 먼저 셋팅 해주세요"
         return render(request, 'dbmanageapp/alldblist.html', {'error': error})
 
-    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+    # 변경 부분1
+    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]) | Q(db_divdate__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+
+    # q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
 
     status_count = []
 
@@ -309,7 +361,8 @@ def emp_dblist(request):
     rangenum = list(reversed(range(1, db_list.count() + 1)))
 
     pagenum = make_get_page(db_list, geton['get_page_num'], geton['wp'])
-    db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-id')[pagenum[0]:pagenum[1]]
+    # 변경부분2
+    db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-db_divdate', '-db_date')[pagenum[0]:pagenum[1]]
     pg_rangenum = rangenum[pagenum[0]:pagenum[1]]
 
     alldb_zip = zip(pg_rangenum, db_list_val)
@@ -448,29 +501,7 @@ def divdb(request):
     error_text = ""
 
 
-
-
-
-
-
-
-
-
-
-
     if request.method == 'POST':
-
-        # #일산꺼 따로 보관
-        # ducon_list = {}
-        # try:
-        #     now_datetime = datetime.today()
-        #     set_time_today = set_search_day(now_datetime, now_datetime)
-        #     ducon = DbUpdateChk.objects.filter(duc_date__range=[set_time_today[0], set_time_today[1]])
-        # except:
-        #     ducon = DbUpdateChk()
-        #
-        #
-
 
         divdb_list = request.POST.getlist('divdb[]')
         divnick_list = request.POST.getlist('divnick[]')
@@ -496,6 +527,7 @@ def divdb(request):
                     div_dv_update = UploadDb.objects.get(id=i)
                     div_dv_update.db_manager = divid_list[k]
                     div_dv_update.db_manager_nick = divnick_list[k]
+                    div_dv_update.db_divdate = timezone.now()
                     div_dv_update.save()
                 k += 1
 
@@ -513,9 +545,6 @@ def divdb(request):
                 error_text = '분배할 값이 입력되지 않았습니다.'
             elif sum(list_int) > db_list.count():
                 error_text = '분배할 값이 DB 수량보다 많습니다.'
-
-
-
     return render(request, 'dbmanageapp/divdb.html',
                   {'db_list': db_list, 'userlist': userlist,'all_db_count':all_db_count, 'db_count_arr': db_count_arr, 'get_list': geton,
                    'marketing_list': marketing_list, 'error_text': error_text})
@@ -729,6 +758,7 @@ def detail_customer(request, id):
     except:
         print('문제야 문제')
     db_status = UploadDb.objects.get(id=id)
+
     if request.method == 'POST':
         if request.POST['sbm_button'] == 'update':
 
@@ -736,6 +766,9 @@ def detail_customer(request, id):
             status_sel = request.POST.get('status_sel')
             payment_sel = request.POST.get('paystatus_sel')
             customer_name = request.POST.get('customer_name')
+            db_memo = request.POST.get('db_memo')
+            if db_memo:
+                DbMemo.objects.create(dm_chkdb=db_status, dm_memos=db_memo)
 
             db_status.db_status = status_sel
             db_status.db_paidstatus = payment_sel
@@ -878,20 +911,13 @@ def workAjax(request):
 
 def test_chk(requese):
     # testitem = UploadDb.objects.select_related('db_name').get(id=869)
-    # print(testitem.db_name.dbn_name)
-    #
     # testitem = UploadDb.objects.get(id=869)
-    # print(testitem.db_name.dbn_name)
-
     # chk_mk = MarketingList.objects.get(id=6)
-    # print(chk_mk.mk_company)
 
     test1 = MarketingList.objects.get(id=5)
     test1['testval'] = 'asdjflkasjdjsdf'
-    print(test1.testval)
     # test2 = test1.mkdname.get(id=35)
     # test3 = test2.dbname.all()
-    # print(test3)
     #
     # test4 = MarketingList.objects.all()
     # for list in test4:

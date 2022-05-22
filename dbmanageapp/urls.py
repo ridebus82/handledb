@@ -19,5 +19,8 @@ urlpatterns = [
     path('base_setting/', views.base_setting, name='base_setting'),
     path('marketer_stats/', views.marketer_stats, name='marketer_stats'),
     path('test_chk/', views.test_chk, name='test_chk'),
+    path('status_stats/', views.status_stats, name='status_stats'),
+
+
 
 ]
