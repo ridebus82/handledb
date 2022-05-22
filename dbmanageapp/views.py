@@ -214,7 +214,7 @@ def alldblist(request):
     status_count = []
 
     #변경 부분1
-    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]])|Q(db_divdate__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
 
 
     all_get = UploadDb.objects.select_related('db_mkname').filter(q)
@@ -232,7 +232,7 @@ def alldblist(request):
 
     pagenum = make_get_page(db_list, geton['get_page_num'], geton['wp'])
     #변경부분2
-    db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-db_divdate','-db_date')[pagenum[0]:pagenum[1]]
+    db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-db_date')[pagenum[0]:pagenum[1]]
     pg_rangenum = rangenum[pagenum[0]:pagenum[1]]
 
     alldb_zip = zip(pg_rangenum, db_list_val)
@@ -318,7 +318,7 @@ def status_stats(request):
         manager_list_arr.append(manager)
         for slist in status_list:
             q = Q()
-            q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]) | Q(db_divdate__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+            q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
             q.add(Q(db_manager=manager['username']), q.AND)
             q.add(Q(db_status=slist), q.AND)
             chk_db = UploadDb.objects.filter(q)
@@ -347,7 +347,7 @@ def emp_dblist(request):
         return render(request, 'dbmanageapp/alldblist.html', {'error': error})
 
     # 변경 부분1
-    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]) | Q(db_divdate__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
 
     # q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
 
@@ -368,7 +368,7 @@ def emp_dblist(request):
 
     pagenum = make_get_page(db_list, geton['get_page_num'], geton['wp'])
     # 변경부분2
-    db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-db_divdate', '-db_date')[pagenum[0]:pagenum[1]]
+    db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-db_date')[pagenum[0]:pagenum[1]]
     pg_rangenum = rangenum[pagenum[0]:pagenum[1]]
 
     alldb_zip = zip(pg_rangenum, db_list_val)
@@ -521,20 +521,6 @@ def divdb(request):
     # test_temp3 = eval(test_temp2)
     # print(type(test_temp3))
     # print(test_temp3['testval'])
-<<<<<<< HEAD
-=======
-
-
-
-
-
-
-
-
-
-
->>>>>>> parent of 5b8c953 (0519 중복 체크 완료)
-
 
     if request.method == 'POST':
 
@@ -566,7 +552,7 @@ def divdb(request):
                     div_dv_update = UploadDb.objects.get(id=i)
                     div_dv_update.db_manager = divid_list[k]
                     div_dv_update.db_manager_nick = divnick_list[k]
-                    div_dv_update.db_divdate = timezone.now()
+                    div_dv_update.db_date = timezone.now()
                     div_dv_update.save()
                 k += 1
 

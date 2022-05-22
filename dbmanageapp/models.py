@@ -53,7 +53,7 @@ class UploadDb(models.Model):
     db_paidstatus = models.CharField(max_length=5, null=True, default='N')
     db_lastpaiddate = models.DateTimeField(auto_now_add=True, null=True)
     db_date = models.DateTimeField(auto_now_add=True, null=True)
-    db_divdate = models.DateTimeField(null=True)
+    # db_divdate = models.DateTimeField(auto_now_add=True, null=True)
 
 
 
