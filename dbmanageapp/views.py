@@ -521,6 +521,19 @@ def divdb(request):
     # test_temp3 = eval(test_temp2)
     # print(type(test_temp3))
     # print(test_temp3['testval'])
+<<<<<<< HEAD
+=======
+
+
+
+
+
+
+
+
+
+
+>>>>>>> parent of 5b8c953 (0519 중복 체크 완료)
 
 
     if request.method == 'POST':
