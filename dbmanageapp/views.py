@@ -312,20 +312,56 @@ def status_stats(request):
     geton = get_getlist(request, q, j)
 
     all_list_arr = []
+    all_status_list = ['총계']
+    all_status_list = all_status_list + status_list
 
     for manager in manager_list:
         manager_list_arr = []
         manager_list_arr.append(manager)
+        q = Q()
+        q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+        q.add(Q(db_manager=manager['username']), q.AND)
+        chk_db = UploadDb.objects.filter(q)
+        manager_list_arr.append(chk_db.count())
         for slist in status_list:
-            q = Q()
-            q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
-            q.add(Q(db_manager=manager['username']), q.AND)
-            q.add(Q(db_status=slist), q.AND)
-            chk_db = UploadDb.objects.filter(q)
-            manager_list_arr.append(chk_db.count())
+            chk_count = chk_db.filter(db_status=slist)
+            manager_list_arr.append(chk_count.count())
         all_list_arr.append(manager_list_arr)
 
-    return render(request, 'dbmanageapp/status_stats.html', {'all_list_arr': all_list_arr, 'status_list': status_list})
+    sum_list_arr = []
+    per_list_arr = []
+    for smlist in all_status_list:
+        sum_list_arr.append(0)
+        per_list_arr.append(0)
+    #
+    sum_list = ['총합']
+    for ilist in all_list_arr:
+        k = 0
+        for bon in ilist:
+            if type(bon) != int:
+                continue
+            else:
+                sum_list_arr[k] = sum_list_arr[k] + bon
+                k += 1
+    sum_list = sum_list + sum_list_arr
+    make_sum = sum_list[1]
+
+
+    j = -1
+    for perchk in sum_list_arr:
+        j = j + 1
+        if j == 0:
+            continue
+        else:
+            if make_sum == 0:
+                make_sum = 1
+            per_on = "%.2f%%" % (perchk / make_sum * 100.0)
+            per_list_arr[j] = per_on
+    per_list = ['']
+    per_list = per_list + per_list_arr
+    appon_list = zip(per_list,sum_list)
+
+    return render(request, 'dbmanageapp/status_stats.html', {'all_list_arr': all_list_arr, 'status_list': all_status_list,'appon_list':appon_list})
 
 @login_required
 def emp_dblist(request):
@@ -393,11 +429,6 @@ def emp_dblist(request):
         response['Location'] += "?"
         response['Location'] += qstring
         return response
-
-    testval = {'test1' : 'asdfasdf', 'test2' : 'asdfasdfdfg'}
-    for key, val in testval.items():
-        print(key)
-        print(val)
 
 
     return render(request, 'dbmanageapp/emp_dblist.html',

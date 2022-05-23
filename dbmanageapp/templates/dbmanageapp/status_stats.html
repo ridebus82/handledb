@@ -90,6 +90,19 @@
       {% endfor %}
     </tr>
     {% endfor %}
+
+    <tr>
+      {% for per_list,dibsum in appon_list %}
+      <td style="background-color:#FAF4C0">
+        {{ dibsum }}
+
+        {% if per_list != 0 %}
+        ({{ per_list }})
+        {% endif %}
+
+      </td>
+      {% endfor %}
+    </tr>
   </table>
 </div>
 <!-- DB 요약 끝 -->
