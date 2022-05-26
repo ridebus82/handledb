@@ -25,6 +25,7 @@ urlpatterns = [
     path('adminchangi/', admin.site.urls),
     path('accounts/', include('accountapp.urls')),
     path('dbmanager/', include('dbmanageapp.urls')),
-    path('super_adm/', include('allmanageapp.urls'))
+    path('super_adm/', include('allmanageapp.urls')),
+    path('aboutex/', include('exapp.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

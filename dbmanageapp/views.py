@@ -819,12 +819,14 @@ def accountmanagement(request):
         i = 0
         for val in id_count:
             temp_user = User.objects.get(id=id_list[int(val)])
-            print(temp_user)
+            change_db_name = UploadDb.objects.filter(db_manager=temp_user)
             temp_user.rete = manager_rate[int(val)]
             temp_user.status = manager_status[int(val)]
             temp_user.nickname = manager_nick[int(val)]
             temp_user.save()
-
+            for onname in change_db_name:
+                onname.db_manager_nick = manager_nick[int(val)]
+                onname.save()
             i += 1
 
     user_list = User.objects.all().order_by('-id')

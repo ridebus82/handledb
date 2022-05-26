@@ -32,7 +32,8 @@ INSTALLED_APPS = [
     'openpyxl',
     'accountapp',
     'dbmanageapp',
-    'allmanageapp'
+    'allmanageapp',
+    'exapp'
 ]
 
 MIDDLEWARE = [
