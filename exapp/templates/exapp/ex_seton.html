@@ -19,135 +19,14 @@
         <div class="container">
             <!-- 검색 -->
             <div class="pt-4">
-                <form action="" method="get">
+                <a href="{% url 'excelset:exseton' %}">엑셀파일 다운</a>
+                <form action="" method="post" enctype="multipart/form-data" id="db_addform">
+                    {% csrf_token %}
+                    <input type="text" name="dbname"> DB네임
+                    <input type="file" name="uploadex" id="" accept=".xls,.xlsx">
+                    <button type="submit">asdfadf</button>
+                </form>
 
-                    <div class="inputlist">
-                        <div class="inputflex">
-                            <div class="center_text">
-                                <input type="date" name="sd" value="{{ get_list.sd }}" class="currentDate_sd">
-                            </div>
-                            <div class="center_text">
-                                <span>~</span>
-                            </div>
-
-                            <div class="center_text">
-                                <input type="date" name="ed" value="{{ get_list.ed }}" class="currentDate_ed">
-                            </div>
-                        </div>
-
-                        <div class="inputflex">
-                            <div class="center_text">
-                                <span>갯수 :</span>
-                            </div>
-
-                            <div class="select is-small">
-                                <select name="wp">
-                                    <option value="10"
-                                            {% if get_list.wp == '10' %} selected {% endif %}>10
-                                    </option>
-                                    <option value="20"
-                                            {% if get_list.wp == '20' or get_list.wp == 20 %} selected {% endif %}>
-                                    20
-                                    </option>
-                                    <option value="50"
-                                            {% if get_list.wp == '50' %} selected {% endif %}>
-                                    50
-                                    </option>
-
-                                    <option value="100"
-                                            {% if get_list.wp == 100 %} selected {% endif %}>
-                                        100
-                                    </option>
-
-                                    <option value="300"
-                                            {% if get_list.wp == 300 %} selected {% endif %}>
-                                        300
-                                    </option>
-
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="inputflex">
-                            <div class="center_text">
-                                <span>마케터 :</span>
-                            </div>
-
-                            <div class="select is-small">
-                                <select name="mk" class="mk">
-                                    <option value="">전체선택</option>
-                                    {% for mlist in marketing_list %}
-                                    <option value="{{ mlist.mk_company }}"
-                                            {% if mlist.mk_company == get_list.mk %}
-                                            selected="selected"
-                                            {% endif %}>{{ mlist.mk_company }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-
-
-                        <div class="inputflex">
-                            <div class="center_text">
-                                <span>DB명 :</span>
-                            </div>
-
-                            <div class="select is-small">
-                                <select name="dn" class="dn">
-                                    <option value="">마케터를 선택하세요</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="inputflex">
-                            <div class="center_text">
-                                <span>담당자 :</span>
-                            </div>
-
-                            <div class="select is-small">
-                                <select name="mn">
-                                    <option value="">전체선택</option>
-                                    {% for mlist in manager_list %}
-                                    <option value="{{ mlist.username }}" {% if mlist.username == get_list.mn %}
-                                            selected="selected"
-                                            {% endif %}>{{ mlist.nickname }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="inputflex">
-                            <div class="center_text">
-                                <span>상태 :</span>
-                            </div>
-
-                            <div class="select is-small">
-                                <select name="ns">
-                                    <option value="">전체선택</option>
-                                    {% for stlist in status_list %}
-                                    <option value="{{ stlist }}" {% if stlist == get_list.ns %}
-                                            selected="selected"
-                                            {% endif %}>{{ stlist }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="inputflex">
-                            <input type="text" class="input is-link is-small" name="ps" value="{{ get_list.ps }}" id=""
-                                   placeholder="전화번호 입력">
-                            <button class="button is-small is-link">검색</button>
-                        </div>
-
-
-                        <a href="{% url 'dbmanage:alldblist' %}" class="button is-small is-warning">초기화</a>
-                    </div>
-                    <a href="{{ response }}" download="테스트">테스트 문서 다운로드</a>
-            </div>
-            </form>
         </div>
     </main>
 </div>
@@ -178,4 +57,11 @@
 
 
 
+
+
+
 {% endblock %}
+
+
+
+
