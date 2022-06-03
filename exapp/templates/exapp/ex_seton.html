@@ -13,6 +13,7 @@
         .employee_list{font-size: 12px;}
       }
 
+
 </style>
 <div id="layoutSidenav_content">
     <main>
@@ -26,12 +27,21 @@
                     <input type="file" name="uploadex" id="" accept=".xls,.xlsx">
                     <button type="submit">asdfadf</button>
                 </form>
+            </div>
+
+            <div class="pt-4">
+                <form action="{% url 'excelset:set_memo' %}" method="post">
+                    {% csrf_token %}
+                    {{ set_count }}개 있음
+                    <button type="submit">DB업데이트</button>
+                </form>
+            </div>
+
+
 
         </div>
     </main>
 </div>
-
-
 
 
 {% if not get_list.sd %}
@@ -41,9 +51,9 @@
         t_date.setHours(t_date.getHours()+9)
         var dateval = t_date.toISOString().substring(0, 10)
         $('.currentDate_sd').val(dateval)
+
 </script>
 {% endif %}
-
 
 
 {% if not get_list.ed %}
@@ -52,12 +62,9 @@
         t_date.setHours(t_date.getHours()+9)
         var dateval = t_date.toISOString().substring(0, 10)
           $('.currentDate_ed').val(dateval)
+
 </script>
 {% endif %}
-
-
-
-
 
 
 {% endblock %}

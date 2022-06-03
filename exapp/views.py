@@ -10,7 +10,7 @@ from django.shortcuts import render
 # Create your views here.
 from openpyxl import load_workbook
 
-from dbmanageapp.models import UploadDb, UploadDbName, MarketingList
+from dbmanageapp.models import UploadDb, UploadDbName, MarketingList, DbMemo
 from datetime import datetime
 
 def exdown(request):
@@ -122,3 +122,15 @@ def ex_setting(request):
 
     return render(request, 'exapp/ex_seton.html')
 
+
+def memo_set(request):
+    chk_db_list = DbMemo.objects.all()
+    set_count = len(chk_db_list)
+
+    if request.method == "POST":
+        for dlist in chk_db_list:
+            if dlist.dm_mamager == "":
+                dlist.dm_mamager = dlist.dm_chkdb.db_manager
+                dlist.save()
+
+    return render(request, 'exapp/ex_seton.html', {'set_count':set_count})

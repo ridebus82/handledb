@@ -480,19 +480,32 @@ def sale_st(request):
     # -------------- 뿌려주기 옵션값 끝!
     q = Q()
     j = Q()
+    p = Q()
 
     get_list = {}
     geton = get_getlist(request, q, j)
 
-    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+    q.add(Q(db_lastpaiddate__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
     j.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
 
     q.add(Q(db_paidstatus='Y'), q.AND)
     q.add(~Q(db_manager=''), q.AND)
 
+
+    # p.add(Q(pl_paiddate__range=[geton['set_date'][0], geton['set_date'][1]]), p.AND)
+    # # p.add(Q(pl_chkdb__db_manager=geton['mn']), p.AND)
+    # paid_db_list = PaidList.objects.filter(p)
+    # for jiji in paid_db_list:
+    #     print(jiji.pl_chkdb.db_manager)
+    #
+    # pagenum = make_get_page(paid_db_list, geton['get_page_num'], geton['wp'])
+    # base_db = PaidList.objects.filter(p).order_by('-pl_paiddate')[pagenum[0]:pagenum[1]]
+
+
+
     db_list = UploadDb.objects.select_related('db_mkname').filter(q)
     pagenum = make_get_page(db_list, geton['get_page_num'], geton['wp'])
-    base_db = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-id')[pagenum[0]:pagenum[1]]
+    base_db = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-db_lastpaiddate')[pagenum[0]:pagenum[1]]
 
     sum = UploadDb.objects.filter(q).aggregate(Sum('db_paidprice'))
     if not sum['db_paidprice__sum']:
@@ -851,7 +864,6 @@ def detail_customer(request, id):
 
     if request.method == 'POST':
         if request.POST['sbm_button'] == 'update':
-
 
             status_sel = request.POST.get('status_sel')
             payment_sel = request.POST.get('paystatus_sel')
