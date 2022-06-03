@@ -868,9 +868,10 @@ def detail_customer(request, id):
             status_sel = request.POST.get('status_sel')
             payment_sel = request.POST.get('paystatus_sel')
             customer_name = request.POST.get('customer_name')
+            ondb_manager = request.POST.get('ondb_manager')
             db_memo = request.POST.get('db_memo')
             if db_memo:
-                DbMemo.objects.create(dm_chkdb=db_status, dm_memos=db_memo)
+                DbMemo.objects.create(dm_chkdb=db_status, dm_memos=db_memo, dm_mamager=ondb_manager)
 
             db_status.db_status = status_sel
             db_status.db_paidstatus = payment_sel

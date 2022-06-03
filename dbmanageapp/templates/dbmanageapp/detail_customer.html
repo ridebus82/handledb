@@ -68,7 +68,7 @@
                         <td>
 
                             <input class="input is-hovered is-small" type="text" name="customer_name" value="{{ customer_info.db_member }}" placeholder="Hovered input">
-
+                            <input type="hidden" name="ondb_manager" value="{{ customer_info.db_manager }}">
 
                         </td>
                         <th>전화번호</th>
@@ -261,7 +261,7 @@ function parent_reload(){
             {% for mlist in memo_list %}
             <tr>
                 <td>{{ mlist.dm_date|date:'y-m-d H:i' }}</td>
-                <td>{{ mlist.dm_chkdb.db_manager }}</td>
+                <td>{{ mlist.dm_mamager }}</td>
                 <td>{{ mlist.dm_memos }}</td>
                 <td>
                      <span class="del_btn"><i class="fa-solid fa-circle-xmark"></i></span>
